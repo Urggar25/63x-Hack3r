@@ -1,5 +1,7 @@
 ﻿# please see phone.rpy for more info and license
 
+define s = Character("Spectre", what_prefix="“", what_suffix="”")
+
 init python:
     intrusion_state = {
         "operation_name": "MIROIR NOIR",
@@ -43,16 +45,16 @@ init python:
 label start:
     scene black
 
-    "Nuit permanente sur District-9."
-    "Les enseignes clignotent comme des blessures ouvertes dans la brume toxique."
-    "Tu n'es pas un héros. Tu es Spectre, un hacker qui vend des vérités volées à ceux qui peuvent payer."
+    play sound sfx_phone_vibration
+    s "Enfin. C'est parti."
+    s "Quelqu'un a mordu à l'hameçon."
 
     window hide
     $ initialize_hacker_phone()
     $ log_credential_theft("Nora Vex", "Boutique 13 // Vieille ville", "QR-8841-GH0ST")
     show screen phone_ui
 
-    $ send_phone_message("", "00:41 // Appartement de Spectre", "ops_feed", 1)
+    $ send_phone_message("", "22:12 // Appartement de Spectre", "ops_feed", 1)
     $ send_phone_message("NEXUS", "Rapport.", "ops_feed")
     $ send_phone_message(phone_config["phone_player_name"], "Le faux QR code dans la boutique miteuse a marché.", "ops_feed")
     $ send_phone_message(phone_config["phone_player_name"], "Identifiants siphonnés: Nora Vex.", "ops_feed")

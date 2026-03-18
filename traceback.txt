@@ -1,0 +1,40 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/script.rpy", line 46, in script
+    play sound sfx_announce
+  File "renpy/common/000statements.rpy", line 301, in execute_play_sound
+    renpy.sound.play(_audio_eval(p["file"]),
+  File "renpy/common/000statements.rpy", line 33, in _audio_eval
+    return eval(expr, locals=store.audio.__dict__)
+  File "game/script.rpy", line 46, in <module>
+    play sound sfx_announce
+NameError: name 'sfx_announce' is not defined
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "game/script.rpy", line 46, in script
+    play sound sfx_announce
+  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 1987, in execute
+    self.call("execute")
+  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 1966, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\statements.py", line 374, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 301, in execute_play_sound
+    renpy.sound.play(_audio_eval(p["file"]),
+  File "renpy/common/000statements.rpy", line 33, in _audio_eval
+    return eval(expr, locals=store.audio.__dict__)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
+    return py_eval_bytecode(code, globals, locals)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
+    return eval(bytecode, globals, locals)
+  File "game/script.rpy", line 46, in <module>
+    play sound sfx_announce
+NameError: name 'sfx_announce' is not defined
+
+Windows-10-10.0.26200 AMD64
+Ren'Py 8.3.7.25031702
+Phone 1.0
+Wed Mar 18 18:17:14 2026
