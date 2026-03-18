@@ -715,7 +715,7 @@ screen phone_ui():
                     add phone_channel_data[current_phone_view]["icon"]:
                             xalign 0.5
                             xysize (50, 50)
-                    text phone_channel_data[current_phone_view]["display_name"] if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r"):
+                    text (phone_channel_data[current_phone_view]["display_name"] if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r")):
                         style "phone_header_style"
                         ypos -5
                 else:
@@ -994,12 +994,17 @@ screen phone_ui():
                             else:
                                 text "Nuage de points des cibles infectées":
                                     style "phone_channel_preview_style"
-                                grid 2 ((len(spyck3r_targets) + 1) // 2):
+
+                                $ rows = (len(spyck3r_targets) + 1) // 2
+
+                                grid 2 rows:
                                     xfill True
                                     spacing 10
+
                                     for target_name in spyck3r_targets:
                                         $ unread = get_spy_unread_count(target_name)
                                         $ label = target_name + (" •" if unread > 0 else "")
+
                                         textbutton label:
                                             action Function(set_spy_target, target_name)
                                             style "phone_target_button_style"

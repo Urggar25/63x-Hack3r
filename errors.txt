@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/phone.rpy", line 997: grid statement expects 2 positional arguments, got 1.
+    grid 2 ((len(spyck3r_targets) + 1) // 2):
+                                             ^
+
+Ren'Py Version: Ren'Py 8.3.7.25031702
+Wed Mar 18 18:37:47 2026
