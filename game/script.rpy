@@ -1,155 +1,117 @@
 ﻿# please see phone.rpy for more info and license
 
-# this is all for the demo only, we can ignore~
-image vanessa_happy = "demo/vanessa.png"
-image bg bedroom = "demo/bedroom.jpg"
-define vanessa = Character("Vanessa", color="#ff00ff")
-transform small_sprite:
-    zoom 0.25
-    xalign 0.5
-    yalign 0.5
-transform jump_up:
-    linear 0.1 yoffset -50
-    linear 0.1 yoffset 0
+init python:
+    intrusion_state = {
+        "operation_name": "MIROIR NOIR",
+        "stolen_credentials": {},
+        "infected_devices": set(),
+        "propagation_links": [],
+    }
 
-# demo!
+    def initialize_hacker_phone():
+        reset_phone_data()
+        set_phone_theme("dark")
+        phone_config["phone_player_name"] = "Spectre"
+        phone_config["channels_title"] = "Ghost Relay"
+        phone_config["history_timestamp_prefix"] = "Trace"
+        phone_config["pause"]["pause_time"] = True
+        phone_config["pause"]["pause_length"] = 0.55
+
+        create_phone_channel("ops_feed", "NEXUS // Supervision", ["NEXUS", phone_config["phone_player_name"]], "phone/icon.png")
+        create_phone_channel("target_nora", "Nora Vex", ["Nora Vex", phone_config["phone_player_name"]], "phone/icons/vanessa.png")
+        create_phone_channel("market_watch", "Caméras // Boutique 13", ["NEXUS", "Drone-Cam"], "phone/icon.png", is_group=True)
+
+    def log_credential_theft(victim_name, location, token):
+        intrusion_state["stolen_credentials"][victim_name] = {
+            "location": location,
+            "token": token,
+        }
+        intrusion_state["infected_devices"].add(victim_name)
+
+    def infect_device(source_name, target_name, channel_id, display_name, participants, icon_path="phone/icon.png"):
+        if channel_id not in phone_channel_data:
+            create_phone_channel(channel_id, display_name, participants, icon_path, is_group=True)
+        intrusion_state["infected_devices"].add(target_name)
+        intrusion_state["propagation_links"].append((source_name, target_name))
+
+    def send_infection_trace(source_name, target_name, channel_id):
+        send_phone_message("", "Propagation latérale détectée", channel_id, 1)
+        send_phone_message("Daemon", "Nœud source: %s" % source_name, channel_id)
+        send_phone_message("Daemon", "Nœud cible: %s" % target_name, channel_id)
+        send_phone_message("Daemon", "Statut: accès micro + messages + galerie", channel_id)
+
 label start:
-
-    # purely demo stuff, ignore again~ (please ignore, it sucks a lot lol)
-    "*Isekai truck.*"
-    scene bg bedroom
-    show vanessa_happy at small_sprite
-    "You're transported to a magical place.. an average anime bedroom."
-    show vanessa_happy at jump_up
-    pause 0.5
-    vanessa "Oh~ hi! Thanks for coming by, I got you a new phone! It's pretty cool~~"
-    vanessa "{size=30}{i}or at least I think so...{/i}{/size}"
-    vanessa "But yeah, don't sweat it too much, it's what I do. I give phones to people who get isekai'd into this world."
-    vanessa "I've already put me in your contacts, as well as my friend Avery. Let's get texting so you can try it out!"
-    "And just like that, Vanessa pulls out the phone and starts showing it off."
-    "I'm gonna clear the screen for this demo, so you can see the phone better, but that isn't required to use the phone in your own game!"
-    window hide
     scene black
-    hide vanessa_happy
 
-    # phone relevant! step one: we set up the environment for the phone (only do this once per game, or whenever you want a clean phone slate to use)
-    # you can either add your pre-existing channels, messages, etc. here or in the reset_phone_data function!
-    $ reset_phone_data()
+    "Nuit permanente sur District-9."
+    "Les enseignes clignotent comme des blessures ouvertes dans la brume toxique."
+    "Tu n'es pas un héros. Tu es Spectre, un hacker qui vend des vérités volées à ceux qui peuvent payer."
 
-    # phone relevant! step two: we start the phone and show the UI
-    $ phone_start()
+    window hide
+    $ initialize_hacker_phone()
+    $ log_credential_theft("Nora Vex", "Boutique 13 // Vieille ville", "QR-8841-GH0ST")
     show screen phone_ui
 
-    # phone relevant! step three: we send messages to the phone
-    $ send_phone_message("", "Later That Day", "vanessa_dm", 1) # EXAMPLE: Time Stamp
-    $ send_phone_message("Vanessa", "Hey!! I'm in your phone now!!", "vanessa_dm") # EXAMPLE: Character sending a message.
-    $ send_phone_message("Vanessa", "<emoji_sob> Get me out! I'm stuck in your phone!! <emoji_sob> <emoji_sob>", "vanessa_dm", 3) # EXAMPLE: Character sending a message with emojis.
-    $ send_phone_message(phone_config["phone_player_name"], "Oh, um..", "vanessa_dm") # EXAMPLE: Player sending a message.
-    $ present_phone_choices([("How can I help!?", None, None), ("What do you mean?", None, None)], "vanessa_dm") # EXAMPLE: Presenting non-branching choices to the player.
-    $ phone_pause(2.0) # EXAMPLE: Forcing a pause in the phone UI.
-    $ send_phone_message("", "That Evening", "vanessa_dm", 1)
-    $ send_phone_message("Vanessa", "Just kidding!!", "vanessa_dm")
-    $ send_phone_message("Vanessa", "Wait, you didn't like.. think I was really stuck, did you?", "vanessa_dm")
-    $ send_phone_message("Vanessa", "You know you can't get stuck in a phone, right?", "vanessa_dm")
-    $ send_phone_message(phone_config["phone_player_name"], "I mean, yeah...", "vanessa_dm")
-    $ send_phone_message(phone_config["phone_player_name"], "...", "vanessa_dm")
-    $ send_phone_message("Vanessa", "Oh! Btdubs! I think Avery is gonna text you now!", "vanessa_dm")
-    $ present_phone_choices([("I'll look", "I'll go check it out!", None)], "vanessa_dm") # EXAMPLE: Fake choice, basically force the user to click the message they want to send. You could do this for every message normally too that the user sends, if you want.
-    
-    # phone relevant! step three continued: we send more messages to the phone, this time sending some images!
-    $ send_phone_message("Avery", "done working out!", "avery_dm")
-    $ send_phone_message("Avery", "look at this cute photo i took while out!", "avery_dm")
-    $ send_phone_message("Avery", "images/phone/media/run.png", "avery_dm", 2, summary_alt="Running Image") # EXAMPLE: Sending an image with a summary alt text.
-    $ send_phone_message("Avery", "i'm so sweaty, but it was a good run!", "avery_dm")
-    $ send_phone_message(phone_config["phone_player_name"], "Wow, nice!", "avery_dm")
-    $ send_phone_message("Avery", "Want a workout pic? About to make food xx", "avery_dm")
-    $ present_phone_choices([("Sure!", "Sure, send it!", Call("SendWorkout")), ("No thanks", "No thanks, I'm good.", Call("DontSendWorkout"))], "avery_dm") # EXAMPLE: Presenting choices that lead to different actions.
-    $ send_phone_message("Avery", "oh ya im gonna add u to a group chat with vanessa", "avery_dm")
-    $ send_phone_message("Avery", "kk?", "avery_dm")
+    $ send_phone_message("", "00:41 // Appartement de Spectre", "ops_feed", 1)
+    $ send_phone_message("NEXUS", "Rapport.", "ops_feed")
+    $ send_phone_message(phone_config["phone_player_name"], "Le faux QR code dans la boutique miteuse a marché.", "ops_feed")
+    $ send_phone_message(phone_config["phone_player_name"], "Identifiants siphonnés: Nora Vex.", "ops_feed")
+    $ send_phone_message("NEXUS", "Confirme l'empreinte.", "ops_feed")
+    $ send_phone_message(phone_config["phone_player_name"], "Token capturé: QR-8841-GH0ST.", "ops_feed")
 
-    # phone relevant! step three continued: group chat time
-    $ create_phone_channel("study_group", "Study Buddies", ["Vanessa", "Avery", phone_config["phone_player_name"]], "phone/icons/study_buddies.png", is_group=True) # EXAMPLE: Creating a group chat (of course, you can also do this before the phone's shown or in reset_phone_data, but this is just an example).
-    $ send_phone_message("Vanessa", "Heyyy, I see you added me to the group chat!", "study_group")
-    $ send_phone_message("Avery", "yep yep", "study_group")
-    $ send_phone_message("Vanessa", "I love group chats, they're so fun!", "study_group")
-    $ send_phone_message(phone_config["phone_player_name"], "i suppose so..", "study_group")
-    $ send_phone_message(phone_config["phone_player_name"], "<emoji_dizzy>", "study_group", 3)
-    $ send_phone_message(phone_config["phone_player_name"], "there's a lot to learn about how to use my new phone!", "study_group", 3)
-    $ send_phone_message("Vanessa", "Don't worry, you'll get the hang of it!", "study_group")
-    $ send_phone_message("Avery", "did you know you can move your phone around?", "study_group")
-    $ send_phone_message("Avery", "like, you can change the position and size of it!", "study_group")
+    $ send_phone_message("Drone-Cam", "Capture rue validée. La cible a scanné le code sans hésiter.", "market_watch")
+    $ send_phone_message("NEXUS", "Injection du spyware maison autorisée.", "market_watch")
 
-    # EXAMPLE: moving the phone around
+    $ send_phone_message("", "Canal compromis // Nora Vex", "target_nora", 1)
+    $ send_phone_message("Nora Vex", "J'ai trouvé un vrai coupon miracle dans cette boutique horrible.", "target_nora")
+    $ send_phone_message("Nora Vex", "Mon téléphone bug un peu depuis... sûrement rien.", "target_nora")
+    $ send_phone_message("Daemon", "Implant actif. Exfiltration des conversations en temps réel.", "target_nora")
+
+    $ switch_channel_view("ops_feed")
+    $ send_phone_message("NEXUS", "La charge virale peut se propager à ses contacts. Choisis la prochaine cible.", "ops_feed")
+
+    menu:
+        "Quelle cible infecter via Nora ?"
+
+        "Jules, chauffeur de transport clandestin":
+            $ infect_device("Nora Vex", "Jules Rane", "jules_thread", "Relais // Jules Rane", ["Jules Rane", "Nora Vex"], "phone/icons/avery.png")
+            $ send_infection_trace("Nora Vex", "Jules Rane", "jules_thread")
+            $ send_phone_message("Jules Rane", "J'ai livré le colis près du checkpoint militaire. Personne ne m'a suivi.", "jules_thread")
+            $ send_phone_message("Nora Vex", "Garde ton calme. Les drones tournent toute la nuit.", "jules_thread")
+            $ send_phone_message("Daemon", "Nouveau carnet d'adresses exfiltré depuis Jules Rane.", "jules_thread")
+            $ send_phone_message("NEXUS", "Bon choix. Les itinéraires de contrebande valent cher.", "ops_feed")
+
+        "Docteure Imani, clinique de fortune":
+            $ infect_device("Nora Vex", "Docteure Imani", "imani_thread", "Relais // Docteure Imani", ["Docteure Imani", "Nora Vex"], "phone/icons/study_buddies.png")
+            $ send_infection_trace("Nora Vex", "Docteure Imani", "imani_thread")
+            $ send_phone_message("Docteure Imani", "La réserve d'antiviraux est vide. Les enfants de la zone rouge rechutent.", "imani_thread")
+            $ send_phone_message("Nora Vex", "Je peux tenter le marché noir, mais les prix ont triplé.", "imani_thread")
+            $ send_phone_message("Daemon", "Dossiers médicaux chiffrés copiés. Déchiffrement en tâche de fond.", "imani_thread")
+            $ send_phone_message("NEXUS", "Bon choix. Les données biométriques ouvrent toutes les portes.", "ops_feed")
+
+    $ create_phone_channel("spread_map", "Propagation // Carte virale", ["Daemon", phone_config["phone_player_name"]], "phone/icon.png", is_group=True)
+    $ send_phone_message("", "Synthèse automatique", "spread_map", 1)
+    $ send_phone_message("Daemon", "Appareils infectés: %d" % len(intrusion_state["infected_devices"]), "spread_map")
+
     python:
-        for i in renpy.store.range(20):
-            phone_x += 0.015
-            renpy.pause(0.01)
-        renpy.pause(0.5)
+        for source, target in intrusion_state["propagation_links"]:
+            send_phone_message("Daemon", "%s  ->  %s" % (source, target), "spread_map")
 
-    $ send_phone_message(phone_config["phone_player_name"], "oh, it's on the right now..", "study_group")
-    $ send_phone_message("Vanessa", "watch out.. i'm gonna make it smaller now too!", "study_group")
+    $ send_phone_message("Daemon", "Le virus se réplique à chaque pièce jointe ouverte.", "spread_map")
+    $ send_phone_message("Daemon", "Probabilité de compromission globale du district en 72h: 78%.", "spread_map")
 
-    # EXAMPLE: changing the phone's size
-    python:
-        phone_zoom -= 0.3
-        renpy.pause(0.5)
+    $ switch_channel_view("ops_feed")
+    $ send_phone_message("NEXUS", "Tu vois ? Une seule arnaque QR, et toute la ville devient transparente.", "ops_feed")
+    $ send_phone_message(phone_config["phone_player_name"], "Je n'espionne plus des téléphones. J'écoute un monde en train de mourir.", "ops_feed")
+    $ send_phone_message("NEXUS", "Continue, Spectre. Le silence est notre seule morale.", "ops_feed")
 
-    $ send_phone_message("Avery", "now it's too small!!! let me put it back to normal", "study_group")
-
-    # EXAMPLE: resetting the phone's size and position
-    python:
-        phone_zoom = 0.9
-        phone_x = 0.5
-        phone_y = 0.5
-        renpy.pause(0.5)
-
-    # phone relevant! step three continued: leaving and joining group chats
-    $ send_phone_message("Avery", "pretend i get mad and storm off!!", "study_group")
-    $ send_phone_message("Avery", "so i can show you how leaving and joining groups works", "study_group")
-    $ send_phone_message("Avery", "dw im not actually mad at u guys lol", "study_group")
-    $ remove_participant_from_group("study_group", "Avery") # EXAMPLE: Someone leaving a group chat.
-    $ send_phone_message("Vanessa", "And... let me add her back!", "study_group")
-    $ add_participant_to_group("study_group", "Avery", "Vanessa") # EXAMPLE: Someone joining a group chat, added by someone.
-    $ send_phone_message("Vanessa", "Welcome back!", "study_group")
-    $ send_phone_message("Avery", "i could've joined back myself y'know..", "study_group")
-    $ remove_participant_from_group("study_group", "Avery")
-    $ send_phone_message("Vanessa", "I guess she wants to show you what it looks like when someone joins on their own..", "study_group")
-    $ add_participant_to_group("study_group", "Avery", None) # EXAMPLE: Someone joining a group chat, not added by anybody.
-    $ send_phone_message("Vanessa", "Lastly, I'll show you how to hide, show, and delete chats.", "study_group")
-    $ send_phone_message("Vanessa", "Let me switch you back to our chat.", "study_group")
-    $ switch_channel_view("vanessa_dm") # EXAMPLE: Forcing the user to look in a channel.
-    $ send_phone_message("Vanessa", "If you go back to the main menu, I'm going to hide and then show Avery's chat.", "vanessa_dm")
-    $ switch_channel_view("channel_list") # EXAMPLE: Forcing the user to look at the channel list.
-    $ hide_phone_channel("avery_dm") # EXAMPLE: Hiding a channel
-    $ send_phone_message("Vanessa", "She's gone!", "vanessa_dm")
-    $ switch_channel_view("channel_list") # Again just to make sure the user in the demo sees the channel appearing / vanishing..
-    $ show_phone_channel("avery_dm") # EXAMPLE: Un-hiding a channel
-    $ send_phone_message("Vanessa", "She's back!", "vanessa_dm")
-    $ send_phone_message("Vanessa", "Now let's delete her channel...", "vanessa_dm")
-    $ switch_channel_view("channel_list") # Again just to make sure the user in the demo sees the channel appearing / vanishing..
-    $ delete_phone_channel("avery_dm") # EXAMPLE: Deleting (permanently) a channel.
-    $ send_phone_message("Vanessa", "And.. that's all!", "vanessa_dm")
-
-    # phone relevant! step four: we return back to the non-phone game dialogue, aka cleaning it all up~
     pause
     hide screen phone_ui
     $ phone_end()
     window show
 
-    "And that concludes our demo with Vanessa and Avery!"
-    "I hope the phone serves useful, please credit me, feel free to donate, and.. um.."
-    "World peace?"
-    "Oh- wait no, I mean, yes to that, but also, I meant to say show me what you make! I'll feature it and stuff!"
-    "You can learn more about me and my contacts at https://luka.moe"
-    "I'll probably have other Ren'Py stuff released too."
-    "<3"
-    return
+    "La pluie acide frappe les vitres comme du code qui s'effondre."
+    "Ton application tourne encore, tapie dans les poches de centaines d'inconnus."
+    "Dans cette dystopie, chaque notification est une confession forcée."
 
-# some demo labels, can ignore these as well~
-label SendWorkout:
-    $ send_phone_message("Avery", "images/phone/media/food.png", "avery_dm", 2, summary_alt="Workout Image")
-    return
-
-label DontSendWorkout:
-    $ send_phone_message("Avery", "no worries!", "avery_dm")
     return
