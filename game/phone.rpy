@@ -198,7 +198,7 @@ init -1 python:
     phone_choice_channel = None  # this holds the channel that the above choice aligns to (one at a time)
     channel_latest_global_id = {} # latest global channel id
     _phone_global_message_counter = 0  # latest global message counter
-    current_phone_app = "messages"  # messages, galerie, spyck3r
+    current_phone_app = "menu"  # menu, messages, galerie, spyck3r
     spyck3r_targets = []
     current_spy_target = None
     spyck3r_infected_at = {}
@@ -400,7 +400,7 @@ init -1 python:
         channel_latest_global_id = {}
         _phone_global_message_counter = 0
         current_phone_view = "channel_list"
-        current_phone_app = "messages"
+        current_phone_app = "menu"
         spyck3r_targets = []
         current_spy_target = None
         spyck3r_infected_at = {}
@@ -720,7 +720,7 @@ screen phone_ui():
                         ypos -5
                 else:
                     null height 40
-                    text ("Messages" if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r")):
+                    text ("Menu" if current_phone_app == "menu" else ("Messages" if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r"))):
                         style "phone_header_style"
                     if current_spy_target is not None:
                         text "Focus: [current_spy_target]":
@@ -730,19 +730,41 @@ screen phone_ui():
                 null height 19
                 hbox:
                     xalign 0.5
-                    spacing 10
-                    textbutton "Messages":
+                    spacing 25
+                    imagebutton:
+                        idle "phone/icons/ui_message.png"
+                        hover "phone/icons/ui_message.png"
+                        focus_mask True
                         action [SetVariable("current_phone_app", "messages"), SetVariable("current_phone_view", "channel_list")]
-                        style "phone_tab_button_style"
-                    textbutton "Galerie":
+                    imagebutton:
+                        idle "phone/icons/ui_galery.png"
+                        hover "phone/icons/ui_galery.png"
+                        focus_mask True
                         action [SetVariable("current_phone_app", "galerie"), SetVariable("current_phone_view", "channel_list")]
-                        style "phone_tab_button_style"
-                    textbutton "SpyCk3r":
+                    imagebutton:
+                        idle "phone/icons/ui_spycker.png"
+                        hover "phone/icons/ui_spycker.png"
+                        focus_mask True
                         action [SetVariable("current_phone_app", "spyck3r"), SetVariable("current_phone_view", "channel_list")]
-                        style "phone_tab_button_style"
                 null height 10
                 # main content
-                if current_phone_app == "messages" and current_phone_view == "channel_list":
+                if current_phone_app == "menu":
+                    vbox:
+                        spacing 18
+                        xalign 0.5
+                        yalign 0.5
+                        add "phone/home.png":
+                            xalign 0.5
+                            fit "contain"
+                            xmaximum 300
+                            ymaximum 220
+                        text "Choisis une app pour afficher son contenu.":
+                            style "phone_channel_preview_style"
+                            xalign 0.5
+                        text "Les messages s'affichent uniquement après clic sur Messages.":
+                            style "phone_channel_preview_style"
+                            xalign 0.5
+                elif current_phone_app == "messages" and current_phone_view == "channel_list":
                     $ yadj = ui.adjustment()
                     viewport:
                         id "message_viewport" 
