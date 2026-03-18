@@ -16,7 +16,7 @@ init python:
         phone_config["phone_player_name"] = "Spectre"
         phone_config["channels_title"] = "Ghost Relay"
         phone_config["history_timestamp_prefix"] = "Trace"
-        phone_config["pause"]["pause_time"] = True
+        phone_config["pause"]["pause_time"] = False
         phone_config["pause"]["pause_length"] = 0.55
 
         create_phone_channel("ops_feed", "NEXUS // Supervision", ["NEXUS", phone_config["phone_player_name"]], "phone/icon.png")
