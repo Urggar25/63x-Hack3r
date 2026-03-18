@@ -198,6 +198,11 @@ init -1 python:
     phone_choice_channel = None  # this holds the channel that the above choice aligns to (one at a time)
     channel_latest_global_id = {} # latest global channel id
     _phone_global_message_counter = 0  # latest global message counter
+    current_phone_app = "messages"  # messages, galerie, spyck3r
+    spyck3r_targets = []
+    current_spy_target = None
+    spyck3r_infected_at = {}
+    spyck3r_saved_media = set()
 
     # replace inline images natively
     def replace_emojis(text):
@@ -236,6 +241,75 @@ init -1 python:
             channel_seen_latest[channel_id] = True
             channel_visible[channel_id] = True
             channel_latest_global_id[channel_id] = 0
+
+    def register_spy_target(person_name):
+        """Registers a person as infected in the in-game SpyCk3r app."""
+        global spyck3r_targets, current_spy_target, spyck3r_infected_at
+        if person_name not in spyck3r_targets:
+            spyck3r_targets.append(person_name)
+            spyck3r_infected_at[person_name] = _phone_global_message_counter + 1
+            if current_spy_target is None:
+                current_spy_target = person_name
+        renpy.restart_interaction()
+
+    def set_spy_target(person_name):
+        """Changes the current SpyCk3r focus target."""
+        global current_spy_target, current_phone_view, current_phone_app
+        if person_name in spyck3r_targets:
+            current_spy_target = person_name
+            current_phone_app = "messages"
+            current_phone_view = "channel_list"
+        renpy.restart_interaction()
+
+    def get_focus_channels():
+        """Returns channels relevant to the currently focused target."""
+        if current_spy_target is None:
+            return [ch for ch in phone_channel_data.keys() if channel_visible.get(ch, True)]
+        filtered_channels = []
+        infection_gate = spyck3r_infected_at.get(current_spy_target, 0)
+        for channel_name in phone_channel_data.keys():
+            if not channel_visible.get(channel_name, True):
+                continue
+            participants = phone_channel_data.get(channel_name, {}).get("participants", [])
+            if current_spy_target not in participants:
+                continue
+            channel_msgs = phone_channels.get(channel_name, [])
+            has_recent_activity = any(msg[4] >= infection_gate for msg in channel_msgs)
+            if has_recent_activity:
+                filtered_channels.append(channel_name)
+        return filtered_channels
+
+    def get_spy_unread_count(person_name):
+        """Counts unread events (messages/photos) for a given infected person."""
+        if person_name not in spyck3r_targets:
+            return 0
+        unread_count = 0
+        for channel_name, has_notif in channel_notifs.items():
+            if not has_notif:
+                continue
+            participants = phone_channel_data.get(channel_name, {}).get("participants", [])
+            if person_name in participants:
+                unread_count += 1
+        return unread_count
+
+    def get_focus_gallery_items():
+        """Returns photos for the focused target since infection."""
+        if current_spy_target is None:
+            return []
+        infection_gate = spyck3r_infected_at.get(current_spy_target, 0)
+        gallery_items = []
+        for channel_name in get_focus_channels():
+            for msg in phone_channels.get(channel_name, []):
+                msg_id, sender, message_text, message_kind, current_global_id, summary_alt, image_x, image_y = msg
+                if message_kind == 2 and current_global_id >= infection_gate:
+                    gallery_items.append((channel_name, sender, message_text, current_global_id, image_x, image_y))
+        gallery_items.sort(key=lambda item: item[3], reverse=True)
+        return gallery_items
+
+    def mark_media_saved(global_message_id):
+        """Marks a gallery item as saved in the player's vault."""
+        spyck3r_saved_media.add(global_message_id)
+        renpy.restart_interaction()
 
     # add messages to a channel in the phone (kind 0 = normal message, kind 1 = timestamp, kind 2 = photo, kind 3 = has emojis)
     def send_phone_message(sender, message_text, channel_name, message_kind=0, summary_alt="none", image_x=320, image_y=320, do_pause=True):
@@ -314,7 +388,8 @@ init -1 python:
             inside this function to pre-populate the phone.
         """
         global current_phone_view, phone_channels, channel_last_message_id, channel_notifs, channel_seen_latest, channel_visible, phone_channel_data
-        global channel_latest_global_id, _phone_global_message_counter
+        global channel_latest_global_id, _phone_global_message_counter, current_phone_app
+        global spyck3r_targets, current_spy_target, spyck3r_infected_at, spyck3r_saved_media
         # reset all our data
         phone_channel_data = {}
         phone_channels = {}
@@ -325,6 +400,11 @@ init -1 python:
         channel_latest_global_id = {}
         _phone_global_message_counter = 0
         current_phone_view = "channel_list"
+        current_phone_app = "messages"
+        spyck3r_targets = []
+        current_spy_target = None
+        spyck3r_infected_at = {}
+        spyck3r_saved_media = set()
         # phone relevant! if you want to add initial chats that appear before anything (or remove the demo ones) do so here~
         create_phone_channel("vanessa_dm", "Vanessa", ["Vanessa", phone_config["phone_player_name"]], "phone/icons/vanessa.png")
         create_phone_channel("avery_dm", "Avery", ["Avery", phone_config["phone_player_name"]], "phone/icons/avery.png")
@@ -635,16 +715,34 @@ screen phone_ui():
                     add phone_channel_data[current_phone_view]["icon"]:
                             xalign 0.5
                             xysize (50, 50)
-                    text phone_channel_data[current_phone_view]["display_name"]:
+                    text phone_channel_data[current_phone_view]["display_name"] if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r"):
                         style "phone_header_style"
                         ypos -5
                 else:
                     null height 40
-                    text phone_config["channels_title"]:
+                    text ("Messages" if current_phone_app == "messages" else ("Galerie" if current_phone_app == "galerie" else "SpyCk3r")):
                         style "phone_header_style"
+                    if current_spy_target is not None:
+                        text "Focus: [current_spy_target]":
+                            size 16
+                            color get_phone_theme_value("channel_preview_text_colour")
+                            xalign 0.5
                 null height 19
+                hbox:
+                    xalign 0.5
+                    spacing 10
+                    textbutton "Messages":
+                        action [SetVariable("current_phone_app", "messages"), SetVariable("current_phone_view", "channel_list")]
+                        style "phone_tab_button_style"
+                    textbutton "Galerie":
+                        action [SetVariable("current_phone_app", "galerie"), SetVariable("current_phone_view", "channel_list")]
+                        style "phone_tab_button_style"
+                    textbutton "SpyCk3r":
+                        action [SetVariable("current_phone_app", "spyck3r"), SetVariable("current_phone_view", "channel_list")]
+                        style "phone_tab_button_style"
+                null height 10
                 # main content
-                if current_phone_view == "channel_list":
+                if current_phone_app == "messages" and current_phone_view == "channel_list":
                     $ yadj = ui.adjustment()
                     viewport:
                         id "message_viewport" 
@@ -656,7 +754,7 @@ screen phone_ui():
                         # list of chats
                         vbox:
                             spacing 15 
-                            $ visible_channels = [ch for ch in phone_channel_data.keys() if channel_visible.get(ch, True)]
+                            $ visible_channels = get_focus_channels()
                             python:
                                 if phone_config["sort_channels_by_latest"]:
                                     channel_list_to_display = sorted(visible_channels, key=lambda ch_name: channel_latest_global_id.get(ch_name, 0), reverse=True)
@@ -698,7 +796,7 @@ screen phone_ui():
                                             background get_phone_theme_value("channel_divider_colour")
                                             xfill True
                                             ysize 1
-                else:
+                elif current_phone_app == "messages":
                     # inside a specific chat
                     $ yadj = ui.adjustment()
                     viewport:
@@ -849,6 +947,62 @@ screen phone_ui():
                                             padding (15, 10)
                             # add a bit of extra padding to the bottom of the viewport
                             null height 30
+                elif current_phone_app == "galerie":
+                    $ yadj = ui.adjustment()
+                    viewport:
+                        id "gallery_viewport"
+                        xfill True
+                        ysize 750
+                        yadjustment yadj
+                        scrollbars "vertical"
+                        mousewheel True
+                        vbox:
+                            spacing 20
+                            $ gallery_items = get_focus_gallery_items()
+                            if len(gallery_items) == 0:
+                                text "Aucune photo collectée depuis l'infection.":
+                                    style "phone_message_style"
+                            for item in gallery_items:
+                                $ ch_name, sender, image_path, g_id, image_x, image_y = item
+                                frame:
+                                    background Frame(get_phone_theme_value("character_bubble_image"), 23, 23)
+                                    padding (12, 12)
+                                    xfill True
+                                    vbox:
+                                        spacing 8
+                                        text "[sender] • [phone_channel_data[ch_name]['display_name']]":
+                                            style "phone_channel_name_style"
+                                        add Image(image_path) at scale_to_fit(400, 300)
+                                        textbutton ("Enregistré" if g_id in spyck3r_saved_media else "Enregistrer"):
+                                            action Function(mark_media_saved, g_id)
+                                            sensitive (g_id not in spyck3r_saved_media)
+                                            style "phone_save_button_style"
+                else:
+                    $ yadj = ui.adjustment()
+                    viewport:
+                        id "spyck3r_viewport"
+                        xfill True
+                        ysize 750
+                        yadjustment yadj
+                        scrollbars "vertical"
+                        mousewheel True
+                        vbox:
+                            spacing 12
+                            if len(spyck3r_targets) == 0:
+                                text "Aucune cible infectée.":
+                                    style "phone_message_style"
+                            else:
+                                text "Nuage de points des cibles infectées":
+                                    style "phone_channel_preview_style"
+                                grid 2 ((len(spyck3r_targets) + 1) // 2):
+                                    xfill True
+                                    spacing 10
+                                    for target_name in spyck3r_targets:
+                                        $ unread = get_spy_unread_count(target_name)
+                                        $ label = target_name + (" •" if unread > 0 else "")
+                                        textbutton label:
+                                            action Function(set_spy_target, target_name)
+                                            style "phone_target_button_style"
 
 style phone_header_style is default:
     size 28
@@ -860,6 +1014,25 @@ style phone_channel_button_style is button:
     hover_background get_phone_theme_value("channel_button_hover_background")
     xpadding 10
     ypadding 8
+
+style phone_tab_button_style is button:
+    background Frame(get_phone_theme_value("character_bubble_image"), 23, 23)
+    hover_background Frame(get_phone_theme_value("player_bubble_hover_image"), 23, 23)
+    xpadding 12
+    ypadding 6
+
+style phone_save_button_style is button:
+    background Frame(get_phone_theme_value("player_bubble_image"), 23, 23)
+    hover_background Frame(get_phone_theme_value("player_bubble_hover_image"), 23, 23)
+    xpadding 12
+    ypadding 6
+
+style phone_target_button_style is button:
+    background Frame(get_phone_theme_value("character_bubble_image"), 23, 23)
+    hover_background Frame(get_phone_theme_value("player_bubble_hover_image"), 23, 23)
+    xfill True
+    xpadding 10
+    ypadding 10
 
 style phone_channel_name_style is default:
     size 22
