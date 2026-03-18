@@ -29,12 +29,14 @@ init python:
             "token": token,
         }
         intrusion_state["infected_devices"].add(victim_name)
+        register_spy_target(victim_name)
 
     def infect_device(source_name, target_name, channel_id, display_name, participants, icon_path="phone/icon.png"):
         if channel_id not in phone_channel_data:
             create_phone_channel(channel_id, display_name, participants, icon_path, is_group=True)
         intrusion_state["infected_devices"].add(target_name)
         intrusion_state["propagation_links"].append((source_name, target_name))
+        register_spy_target(target_name)
 
     def send_infection_trace(source_name, target_name, channel_id):
         send_phone_message("", "Propagation latérale détectée", channel_id, 1)
@@ -68,6 +70,7 @@ label start:
     $ send_phone_message("Nora Vex", "J'ai trouvé un vrai coupon miracle dans cette boutique horrible.", "target_nora")
     $ send_phone_message("Nora Vex", "Mon téléphone bug un peu depuis... sûrement rien.", "target_nora")
     $ send_phone_message("Daemon", "Implant actif. Exfiltration des conversations en temps réel.", "target_nora")
+    $ send_phone_message("Nora Vex", "phone/media/food.png", "target_nora", 2, summary_alt="Photo reçue")
 
     $ switch_channel_view("ops_feed")
     $ send_phone_message("NEXUS", "La charge virale peut se propager à ses contacts. Choisis la prochaine cible.", "ops_feed")
@@ -101,6 +104,14 @@ label start:
 
     $ send_phone_message("Daemon", "Le virus se réplique à chaque pièce jointe ouverte.", "spread_map")
     $ send_phone_message("Daemon", "Probabilité de compromission globale du district en 72h: 78%.", "spread_map")
+
+    # Démo explicite de la règle Joseph-Marie visible depuis les deux cibles.
+    $ infect_device("Nora Vex", "Joseph", "joseph_marie", "Joseph ↔ Marie", ["Joseph", "Marie"], "phone/icons/avery.png")
+    $ infect_device("Joseph", "Marie", "joseph_marie", "Joseph ↔ Marie", ["Joseph", "Marie"], "phone/icons/study_buddies.png")
+    $ send_phone_message("", "Canal miroir actif // Joseph-Marie", "joseph_marie", 1)
+    $ send_phone_message("Joseph", "Je passe au checkpoint nord dans 20 minutes.", "joseph_marie")
+    $ send_phone_message("Marie", "Reçu. J'efface le trajet après lecture.", "joseph_marie")
+    $ send_phone_message("Joseph", "phone/media/run.png", "joseph_marie", 2, summary_alt="Photo interceptée")
 
     $ switch_channel_view("ops_feed")
     $ send_phone_message("NEXUS", "Tu vois ? Une seule arnaque QR, et toute la ville devient transparente.", "ops_feed")
