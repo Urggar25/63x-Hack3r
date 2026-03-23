@@ -1,9 +1,14 @@
 init python:
+    import re
+
     GHOSTNET_MODULES = ["Discussion", "Galerie", "Réseau"]
 
     GHOSTNET_PROFILE_FALLBACK = {"id": "fallback", "label": "Aucune photo", "bg": "#d9d9d9", "fg": "#666666", "image": None}
 
     GHOSTNET_GALLERY_LIBRARY = {"romie": [], "bryonn": []}
+    GHOSTNET_INLINE_IMAGE_MAP = {
+        "romie_pic001.png": "images/character/romie_pic001.png",
+    }
 
     def ghostnet_get_dialogues(victim_id):
         return ghostnet_victims[victim_id]["dialogues"]
@@ -120,17 +125,22 @@ init python:
     # -------------------------------------------------------------------
     # Déclaration des images
 
+    def ghostnet_extract_media_and_text(raw_text):
+        cleaned_text = raw_text or ""
+        media_image = None
+
+        for filename in re.findall(r"\[([^\[\]]+\.png)\]", cleaned_text, flags=re.IGNORECASE):
+            mapped_image = GHOSTNET_INLINE_IMAGE_MAP.get(filename.lower())
+            if mapped_image and media_image is None:
+                media_image = mapped_image
+            cleaned_text = re.sub(r"\[" + re.escape(filename) + r"\]", "", cleaned_text, flags=re.IGNORECASE)
+
+        cleaned_text = cleaned_text.strip()
+        return cleaned_text, media_image
+
     def ghostnet_dialogue_media_image(dialogue_chunk):
-        speaker_id = dialogue_chunk.get("speaker_id")
-        text = dialogue_chunk.get("text", "").lower()
-
-        if speaker_id != "romie":
-            return None
-
-        if "[romie_pic001.png]" in text:
-            return "images/character/romie_pic001.png"
-
-        return None
+        _cleaned_text, media_image = ghostnet_extract_media_and_text(dialogue_chunk.get("text", ""))
+        return media_image
 
 
 default ghostnet_active_module = "Discussion"
@@ -142,6 +152,7 @@ default ghostnet_profile_photo_choices = {
     "bryonn": 0,
 }
 default ghostnet_runtime_gallery = {}
+default ghostnet_lightbox_image = None
 default ghostnet_victims = ghostnet_build_victims()
 
 screen ghostnet_avatar_preview(character_id):
@@ -280,15 +291,15 @@ screen ghostnet_v2_ui():
                         text "Aucune photo collectée." color "#32536a" size 20
                     else:
                         for photo in gallery:
-                            button:
-                                action Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"])
+                            frame:
                                 background photo["bg"]
                                 xfill True
                                 xpadding 10
                                 ypadding 10
                                 hbox:
                                     spacing 10
-                                    frame:
+                                    button:
+                                        action SetVariable("ghostnet_lightbox_image", photo.get("image"))
                                         background photo["fg"]
                                         xsize 120
                                         ysize 80
@@ -302,7 +313,13 @@ screen ghostnet_v2_ui():
                                         if ghostnet_profile_photo(ghostnet_selected_device)["id"] == photo["id"]:
                                             text "Photo de profil active" color "#2c5b77" size 14
                                         else:
-                                            text "Cliquer pour appliquer cette photo" color "#2c5b77" size 14
+                                            textbutton "Appliquer cette photo":
+                                                action Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"])
+                                                background "#2e5a78"
+                                                text_color "#eef7ff"
+                                                text_size 14
+                                                xpadding 10
+                                                ypadding 4
 
                 else:
                     text "Réseau" color "#153247" size 38
@@ -324,6 +341,9 @@ screen ghostnet_v2_ui():
                                 text "[character_data['speaker']]" color "#1d3f57" size 21
                                 text "Appareil : [character_data['device_name']]" color "#355d78" size 15
                                 text "Discussions accessibles : [available]" color "#476f8c" size 14
+                                $ tags_for_character = sorted({ghostnet_victims[d]["unlock_tag"] for d in ghostnet_visible_discussion_ids_for_device(character_id) if ghostnet_victims[d].get("unlock_tag") and ghostnet_victims[d]["unlock_tag"] in ghostnet_unlocked_tags})
+                                if tags_for_character:
+                                    text "Tags débloqués : [', '.join(tags_for_character)]" color "#476f8c" size 14
 
         frame:
             background "#f1f7fc"
@@ -350,6 +370,7 @@ screen ghostnet_v2_ui():
                             scrollbars "vertical"
                             yfill True
                             xfill True
+                            yinitial 1.0
 
                             vbox:
                                 spacing 10
@@ -357,6 +378,7 @@ screen ghostnet_v2_ui():
                                     if chunk["side"] == "center":
                                         text "[chunk['text']]" color "#5c819d" size 24 xalign 0.5
                                     else:
+                                        $ clean_text, media_image = ghostnet_extract_media_and_text(chunk["text"])
                                         $ photo = ghostnet_profile_photo(chunk["speaker_id"])
                                         hbox:
                                             spacing 8
@@ -376,13 +398,14 @@ screen ghostnet_v2_ui():
                                                 xpadding 12
                                                 ypadding 8
                                                 vbox:
-                                                    $ media_image = ghostnet_dialogue_media_image(chunk)
                                                     spacing 2
                                                     text "[chunk['speaker']]   [chunk['date']]" color "#32536a" size 15
-                                                    text "[chunk['text']]" color "#112c40" size 21
+                                                    if clean_text:
+                                                        text "[clean_text]" color "#112c40" size 21
                                                     if media_image:
                                                         null height 4
-                                                        frame:
+                                                        button:
+                                                            action SetVariable("ghostnet_lightbox_image", media_image)
                                                             background "#ecf4fb"
                                                             xsize 360
                                                             ysize 240
@@ -438,7 +461,36 @@ screen ghostnet_v2_ui():
                     else:
                         text "Aucun tag débloqué." color "#2d5168" size 18
 
-                textbutton "Quitter simulation" action Return()
+    if ghostnet_lightbox_image:
+        frame:
+            background "#000c"
+            xfill True
+            yfill True
+            button:
+                action SetVariable("ghostnet_lightbox_image", None)
+                background None
+                xfill True
+                yfill True
+
+            frame:
+                background "#10283a"
+                xalign 0.5
+                yalign 0.5
+                xsize 980
+                ysize 680
+                xpadding 14
+                ypadding 14
+                vbox:
+                    spacing 10
+                    add ghostnet_lightbox_image fit "contain" xsize 952 ysize 610
+                    textbutton "Fermer":
+                        action SetVariable("ghostnet_lightbox_image", None)
+                        xalign 1.0
+                        background "#2e5a78"
+                        text_color "#eef7ff"
+                        text_size 16
+                        xpadding 12
+                        ypadding 6
 
 label ghostnet_demo:
     call screen ghostnet_v2_ui
