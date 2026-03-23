@@ -207,7 +207,6 @@ screen ghostnet_avatar_preview(character_id):
 screen ghostnet_v2_ui():
     tag menu
     modal True
-    default dialogue_scroll = ui.adjustment()
 
     $ visible_ids = ghostnet_visible_discussion_ids_for_device(ghostnet_selected_device)
 
@@ -224,7 +223,6 @@ screen ghostnet_v2_ui():
     if ghostnet_active_module == "Discussion" and victim and not all_loaded:
         key "dismiss" action [
             Function(ghostnet_next_dialogue_and_scroll, ghostnet_selected_victim),
-            SetScreenVariable("dialogue_scroll", ui.adjustment(value=1.0, range=1.0)),
         ]
 
     add Solid("#d5e7f2")
@@ -394,7 +392,7 @@ screen ghostnet_v2_ui():
                             scrollbars "vertical"
                             yfill True
                             xfill True
-                            yadjustment dialogue_scroll
+                            yinitial 1.0
 
                             vbox:
                                 spacing 10
