@@ -674,7 +674,8 @@ screen terminal_ui():
         background "#081018cc"
         xpadding 12
         ypadding 6
-        textbutton ("TERMINAL" if ghost_net_mode else "GHOST NET [V]"):
+
+        textbutton ("TERMINAL" if ghost_net_mode else "GHOST NET [[V]]"):
             text_size 16
             text_color "#86faff"
             action ToggleVariable("ghost_net_mode")
@@ -762,6 +763,11 @@ screen ghost_net_ui():
                             for key in terminal_engine.sorted_victim_keys():
                                 $ victim = terminal_engine.victims[key]
                                 if not ((ghost_net_query == "heat" and victim.get("heat", 0) <= 50) or (ghost_net_query == "low_inf" and victim.get("infection", 0) >= 30)):
+                                    $ inf_value = victim.get("infection", 0)
+                                    $ heat_value = victim.get("heat", 0)
+                                    $ inf_color = "#7dffbb" if inf_value < 50 else "#ffc65a" if inf_value < 80 else "#ff5e6a"
+                                    $ heat_color = "#8be0ff" if heat_value < 50 else "#ff62a8"
+
                                     button:
                                         background "#0f1a2a"
                                         hover_background "#12223a"
@@ -776,12 +782,12 @@ screen ghost_net_ui():
                                                 color "#ebf7ff"
                                                 size 20
                                                 xminimum 235
-                                            text "INF [victim.get('infection', 0)]%":
-                                                color "#7dffbb" if victim.get("infection", 0) < 50 else ("#ffc65a" if victim.get("infection", 0) < 80 else "#ff5e6a")
+                                            text "INF [inf_value]%":
+                                                color inf_color
                                                 size 18
                                                 xminimum 130
-                                            text "HEAT [victim.get('heat', 0)]%":
-                                                color "#8be0ff" if victim.get("heat", 0) < 50 else "#ff62a8"
+                                            text "HEAT [heat_value]%":
+                                                color heat_color
                                                 size 18
                                                 xminimum 130
                                             text "Valeur ★[victim.get('value', 0)]":
@@ -803,18 +809,22 @@ screen ghost_net_ui():
                     yfill True
                     xpadding 20
                     ypadding 20
+
                     for key in terminal_engine.sorted_victim_keys():
                         $ victim = terminal_engine.victims[key]
                         $ pos = graph_positions.get(key, (random.random(), random.random()))
+                        $ heat_color = "#7ff9ff" if victim.get("heat", 0) < 50 else "#ff63ad"
+
                         frame:
                             xpos int(config.screen_width * pos[0])
                             ypos int(config.screen_height * pos[1])
                             background "#121d2d"
                             xpadding 14
                             ypadding 8
+
                             textbutton "[victim.get('display_name', key)]\nINF [victim.get('infection', 0)]%":
                                 action SetVariable("ghost_net_selected", key)
-                                text_color "#7ff9ff" if victim.get("heat", 0) < 50 else "#ff63ad"
+                                text_color heat_color
                                 text_size 15
 
         if ghost_net_selected in terminal_engine.victims:

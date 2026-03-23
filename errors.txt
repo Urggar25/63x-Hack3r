@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/terminal.rpy", line 526: 'xpadding' is not a keyword argument or valid child of the text statement.
-    xpadding 16
-            ^
+File "game/terminal.rpy", line 822: The if statement is not a valid child of the textbutton statement.
+    text_color "#7ff9ff" if victim.get("heat", 0) < 50 else "#ff63ad"
+                           ^
 
 Ren'Py Version: Ren'Py 8.3.7.25031702
-Mon Mar 23 18:57:30 2026
+Mon Mar 23 19:17:57 2026

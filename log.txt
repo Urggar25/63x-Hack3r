@@ -1,64 +1,18 @@
-<<<<<<< Updated upstream
-2026-03-23 17:26:07 UTC
+2026-03-23 18:19:16 UTC
 Windows-10-10.0.26200
 Ren'Py 8.3.7.25031702
 
 Early init took 0.06s
 Loading error handling took 0.03s
-Loading script took 0.40s
-Loading save slot metadata took 0.04s
+Loading script took 0.21s
+Loading save slot metadata took 0.05s
 Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 526: 'xpadding' is not a keyword argument or valid child of the text statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.44s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 202.86s
-Loading error handling took 0.02s
-Loading script took 0.12s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 541: 'xpadding' is not a keyword argument or valid child of the vbox statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.18s
-=======
-2026-03-23 16:40:00 UTC
-Windows-10-10.0.26200
-Ren'Py 8.3.7.25031702
-
-Early init took 0.07s
-Loading error handling took 0.03s
-Loading script took 0.11s
-Loading save slot metadata took 0.03s
-Loading persistent took 0.00s
-Running init code took 0.05s
-Loading analysis data took 0.01s
+Running init code took 0.06s
+Loading analysis data took 0.02s
 Analyze and compile ATL took 0.00s
-Reloading save slot metadata took 0.21s
+Reloading save slot metadata took 0.02s
 Index archives took 0.00s
-Dump and make backups took 0.08s
+Dump and make backups took 0.04s
 Cleaning cache took 0.00s
 Making clean stores took 0.00s
 Initial gc took 0.03s
@@ -72,12 +26,11 @@ Build styles took 0.00s
 Load screen analysis took 0.03s
 Analyze screens took 0.00s
 Save screen analysis took 0.00s
-Prepare screens took 0.06s
+Prepare screens took 0.07s
 Save pyanalysis. took 0.00s
-Save bytecode. took 0.00s
+Save bytecode. took 0.03s
 Running _start took 0.00s
-Interface start took 0.68s
->>>>>>> Stashed changes
+Interface start took 0.54s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 1920, 1080)
@@ -91,212 +44,92 @@ Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
 Maximum texture size: 4096x4096
+
+Full traceback:
+  File "game/script.rpy", line 9, in script
+    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
+  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
+    Say.execute(self)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 591, in execute
+    statement_name(stmt_name)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 58, in statement_name
+    i(name)
+  File "renpy/common/000window.rpy", line 132, in _window_auto_callback
+    _window_show(auto=True)
+  File "renpy/common/000window.rpy", line 75, in _window_show
+    renpy.with_statement(trans)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\statementexports.py", line 257, in with_statement
+    return renpy.game.interface.do_with(trans, paired, clear=clear)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 1581, in do_with
+    return self.interact(trans_pause=True,
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
+    d.visit_all(callback, seen)
+  [Previous line repeated 1 more time]
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
+    self.screen.function(**self.scope)
+  File "game/terminal.rpy", line 603, in execute
+    screen terminal_ui():
+  File "game/terminal.rpy", line 603, in execute
+    screen terminal_ui():
+  File "game/terminal.rpy", line 671, in execute
+    frame:
+  File "game/terminal.rpy", line 677, in execute
+    textbutton ("TERMINAL" if ghost_net_mode else "GHOST NET [V]"):
+  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2177, in _scope
+    return self.set_text(self.text_parameter, scope, self.substitute, update)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
+    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
+  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
+    s = interpolate(s, variables) # type: ignore
+  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
+    raise e
+  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
+    value = renpy.python.py_eval(code, {}, scope)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
+    return py_eval_bytecode(code, globals, locals)
+  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
+    return eval(bytecode, globals, locals)
+  File "<none>", line 1, in <module>
+NameError: name 'V' is not defined
+
+While running game code:
+  File "game/script.rpy", line 9, in script
+    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
+  File "renpy/common/000window.rpy", line 132, in _window_auto_callback
+    _window_show(auto=True)
+  File "renpy/common/000window.rpy", line 75, in _window_show
+    renpy.with_statement(trans)
+  File "game/terminal.rpy", line 603, in execute
+    screen terminal_ui():
+  File "game/terminal.rpy", line 603, in execute
+    screen terminal_ui():
+  File "game/terminal.rpy", line 671, in execute
+    frame:
+  File "game/terminal.rpy", line 677, in execute
+    textbutton ("TERMINAL" if ghost_net_mode else "GHOST NET [V]"):
+NameError: name 'V' is not defined
 Resetting cache.
-Early init took 203.97s
-Loading error handling took 0.02s
-Loading script took 0.11s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 541: 'xpadding' is not a keyword argument or valid child of the vbox statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.19s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 204.61s
-Loading error handling took 0.02s
-Loading script took 0.12s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 541: 'xpadding' is not a keyword argument or valid child of the vbox statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.17s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 222.10s
-Loading error handling took 0.02s
-Loading script took 0.11s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 541: 'xpadding' is not a keyword argument or valid child of the vbox statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.16s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 222.64s
-Loading error handling took 0.02s
-Loading script took 0.11s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 541: 'xpadding' is not a keyword argument or valid child of the vbox statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.16s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 1881.89s
-Loading error handling took 0.02s
-Loading script took 0.12s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 526: 'xpadding' is not a keyword argument or valid child of the text statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.37s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 1882.63s
-Loading error handling took 0.02s
-Loading script took 0.11s
-Loading save slot metadata took 0.02s
-Loading persistent took 0.00s
-
-File "game/terminal.rpy", line 526: 'xpadding' is not a keyword argument or valid child of the text statement.
-    xpadding 16
-            ^
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Interface start took 0.19s
-
-Initializing gl2 renderer:
-primary display bounds: (0, 0, 1920, 1080)
-swap interval: 1 frames
-Windowed mode.
-Vendor: "b'Intel'"
-Renderer: b'Intel(R) UHD Graphics 770'
-Version: b'4.6.0 - Build 32.0.101.7084'
-Display Info: None
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
-Maximum texture size: 4096x4096
-Resetting cache.
-Early init took 1919.07s
-Loading error handling took 0.02s
-Loading script took 0.16s
-Loading save slot metadata took 0.22s
-Loading persistent took 0.00s
-Running init code took 0.06s
-Loading analysis data took 0.01s
-Analyze and compile ATL took 0.00s
-Reloading save slot metadata took 0.02s
-Index archives took 0.00s
-Backing up script files to 'C:\\Users\\fasqu\\AppData\\Roaming/RenPy/backups\\63x-Hack3r':
-Dump and make backups took 0.05s
-Cleaning cache took 0.00s
-Making clean stores took 0.00s
-Initial gc took 0.03s
-DPI scale factor: 1.000000
-nvdrs: Loaded, about to disable thread optimizations.
-nvdrs: b"Couldn't load nvlib." (can be ignored)
-Creating interface object took 0.00s
-Cleaning stores took 0.00s
-Init translation took 0.00s
-Build styles took 0.00s
-<<<<<<< Updated upstream
-=======
-Load screen analysis took 0.03s
-Analyze screens took 0.00s
-Prepare screens took 0.00s
-Running _start took 0.00s
-Cleaning stores took 0.00s
-Init translation took 0.00s
-Build styles took 0.00s
-Load screen analysis took 0.03s
-Analyze screens took 0.00s
-Prepare screens took 0.00s
-Running _start took 0.00s
-Resetting cache.
-Early init took 252.31s
+Early init took 46.71s
 Loading error handling took 0.03s
-Loading script took 0.15s
+Loading script took 0.18s
 Loading save slot metadata took 0.02s
 Loading persistent took 0.00s
 Running init code took 0.03s
-Loading analysis data took 0.01s
+Loading analysis data took 0.02s
 Analyze and compile ATL took 0.00s
 Reloading save slot metadata took 0.02s
 Index archives took 0.00s
@@ -312,22 +145,14 @@ Creating interface object took 0.00s
 Cleaning stores took 0.00s
 Init translation took 0.00s
 Build styles took 0.00s
->>>>>>> Stashed changes
 Load screen analysis took 0.00s
-Analyze screens took 0.01s
-Save screen analysis took 0.02s
-Prepare screens took 0.06s
-<<<<<<< Updated upstream
+Analyze screens took 0.02s
+Save screen analysis took 0.03s
+Prepare screens took 0.07s
 Save pyanalysis. took 0.02s
-Save bytecode. took 0.02s
+Save bytecode. took 0.03s
 Running _start took 0.00s
-Interface start took 0.36s
-=======
-Save pyanalysis. took 0.00s
-Save bytecode. took 0.02s
-Running _start took 0.00s
-Interface start took 0.39s
->>>>>>> Stashed changes
+Interface start took 0.40s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 1920, 1080)
@@ -341,420 +166,58 @@ Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
 Maximum texture size: 4096x4096
 Screen sizes: virtual=(1920, 1080) physical=(1920, 1009) drawable=(1920, 1009)
 Maximum texture size: 4096x4096
-<<<<<<< Updated upstream
 
 Full traceback:
-  File "game/script.rpy", line 9, in script
-    s "Tape help pour la base, puis commence à scanner et infecter des cibles."
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
     Say.execute(self)
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 623, in execute
     renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
-    self.screen.function(**self.scope)
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2079, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-NameError: name 'ERR' is not defined
+  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 121, in say
+    what = what % tag_quoting_dict
+TypeError: must be real number, not TagQuotingDict
 
 While running game code:
-  File "game/script.rpy", line 9, in script
-    s "Tape help pour la base, puis commence à scanner et infecter des cibles."
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-NameError: name 'ERR' is not defined
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
+TypeError: must be real number, not TagQuotingDict
 
 Full traceback:
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
     Say.execute(self)
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 623, in execute
     renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
-    self.screen.function(**self.scope)
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2079, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-NameError: name 'ERR' is not defined
+  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 121, in say
+    what = what % tag_quoting_dict
+TypeError: must be real number, not TagQuotingDict
 
 While running game code:
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-NameError: name 'ERR' is not defined
-While handling exception:
-Traceback (most recent call last):
-  File "C:\Users\fasqu\Desktop\renpy\renpy\execution.py", line 599, in run
-    node.execute()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
-    Say.execute(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 623, in execute
-    renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
-    self.screen.function(**self.scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 2716, in __call__
-    self.execute(context)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 2654, in execute
-    SLBlock.execute(self.const_ast, context) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 500, in execute
-    i.execute(context)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 1098, in execute
-    i.execute(ctx)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 1098, in execute
-    i.execute(ctx)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 1098, in execute
-    i.execute(ctx)
-  [Previous line repeated 2 more times]
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 1787, in execute
-    i.execute(ctx)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\sl2\slast.py", line 1055, in execute
-    d = self.displayable(*positional, **keywords)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2079, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-NameError: name 'ERR' is not defined
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\error.py", line 140, in report_exception
-    renpy.game.invoke_in_new_context(
-  File "C:\Users\fasqu\Desktop\renpy\renpy\game.py", line 303, in invoke_in_new_context
-    return callable(*args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\error.py", line 48, in call_exception_screen
-    return renpy.ui.interact(mouse="screen", type="screen", suppress_overlay=True, suppress_underlay=True)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 3289, in interact_core
-    rv = root_widget.event(ev, x, y, 0)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 794, in event
-    rv = self.child.event(ev, x, y, st)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1526, in event
-    rv = super(Window, self).event(ev, x, y, st)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 285, in event
-    rv = d.event(ev, x - xo, y - yo, st)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 285, in event
-    rv = d.event(ev, x - xo, y - yo, st)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\layout.py", line 1297, in event
-    rv = i.event(ev, x - xo, y - yo, cst)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\behavior.py", line 1182, in event
-    return handle_click(self.clicked)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\behavior.py", line 1103, in handle_click
-    rv = run(action)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\behavior.py", line 401, in run
-    return action(*args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\error.py", line 55, in rollback_action
-    renpy.exports.rollback(force=True)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\rollbackexports.py", line 235, in rollback
-    renpy.game.log.rollback(checkpoints, greedy=greedy, label=label, force=(force is True), abnormal=abnormal, current_label=current_label)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\rollback.py", line 930, in rollback
-    self.load_failed()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\rollback.py", line 848, in load_failed
-    raise Exception("Couldn't find a place to stop rolling back. Perhaps the script changed in an incompatible way?")
-Exception: Couldn't find a place to stop rolling back. Perhaps the script changed in an incompatible way?
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
+TypeError: must be real number, not TagQuotingDict
+Cleaning stores took 0.00s
+Init translation took 0.00s
+Build styles took 0.00s
+Load screen analysis took 0.03s
+Analyze screens took 0.00s
+Prepare screens took 0.00s
+Running _start took 0.00s
 
 Full traceback:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\bootstrap.py", line 359, in bootstrap
-    renpy.main.main()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\main.py", line 652, in main
-    run(restart)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\main.py", line 148, in run
-    renpy.execution.run_context(True)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\execution.py", line 958, in run_context
-    context.run()
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
     Say.execute(self)
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 623, in execute
     renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
-    self.screen.function(**self.scope)
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2079, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-NameError: name 'ERR' is not defined
+  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 121, in say
+    what = what % tag_quoting_dict
+TypeError: must be real number, not TagQuotingDict
 
 While running game code:
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-NameError: name 'ERR' is not defined
-=======
->>>>>>> Stashed changes
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
+TypeError: must be real number, not TagQuotingDict

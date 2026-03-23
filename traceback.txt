@@ -1,114 +1,24 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-NameError: name 'ERR' is not defined
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
+TypeError: must be real number, not TagQuotingDict
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\bootstrap.py", line 359, in bootstrap
-    renpy.main.main()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\main.py", line 652, in main
-    run(restart)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\main.py", line 148, in run
-    renpy.execution.run_context(True)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\execution.py", line 958, in run_context
-    context.run()
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
-  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
-  File "game/script.rpy", line 8, in script
-    s "Le terminal est verrouillé à l'écran. On fait tout depuis ici."
+  File "game/script.rpy", line 12, in script
+    "Essaye : prompt set \"ghost@darknet[HEAT:%heat%]:~$ \""
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 2586, in execute
     Say.execute(self)
   File "C:\Users\fasqu\Desktop\renpy\renpy\ast.py", line 623, in execute
     renpy.exports.say(who, what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 132, in say
-    who(what, *args, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1471, in __call__
-    self.do_display(who, what, cb_args=self.cb_args, dtt=dtt, **display_args)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 1117, in do_display
-    display_say(who,
-  File "C:\Users\fasqu\Desktop\renpy\renpy\character.py", line 814, in display_say
-    rv = renpy.ui.interact(mouse='say', type=type, roll_forward=roll_forward)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\ui.py", line 301, in interact
-    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2218, in interact
-    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in interact_core
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\displayable.py", line 434, in visit_all
-    d.visit_all(callback, seen)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 480, in visit_all
-    callback(self)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\core.py", line 2748, in <lambda>
-    root_widget.visit_all(lambda d : d.per_interact())
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 491, in per_interact
-    self.update()
-  File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
-    self.screen.function(**self.scope)
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 512, in execute
-    screen terminal_ui():
-  File "game/terminal.rpy", line 516, in execute
-    frame:
-  File "game/terminal.rpy", line 521, in execute
-    has vbox
-  File "game/terminal.rpy", line 532, in execute
-    viewport:
-  File "game/terminal.rpy", line 542, in execute
-    frame:
-  File "game/terminal.rpy", line 547, in execute
-    vbox:
-  File "game/terminal.rpy", line 550, in execute
-    for line in terminal_engine.output:
-  File "game/terminal.rpy", line 551, in execute
-    text line:
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2079, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-NameError: name 'ERR' is not defined
+  File "C:\Users\fasqu\Desktop\renpy\renpy\exports\sayexports.py", line 121, in say
+    what = what % tag_quoting_dict
+TypeError: must be real number, not TagQuotingDict
 
 Windows-10-10.0.26200 AMD64
 Ren'Py 8.3.7.25031702
 Phone 1.0
-Mon Mar 23 18:58:56 2026
+Mon Mar 23 19:20:53 2026
