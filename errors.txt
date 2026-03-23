@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/phone.rpy", line 759: 'xmaximum' is not a keyword argument or valid child of the add statement.
-    xmaximum 300
+File "game/terminal.rpy", line 526: 'xpadding' is not a keyword argument or valid child of the text statement.
+    xpadding 16
             ^
 
 Ren'Py Version: Ren'Py 8.3.7.25031702
-Wed Mar 18 19:00:56 2026
+Mon Mar 23 18:57:30 2026

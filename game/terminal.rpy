@@ -520,28 +520,37 @@ screen terminal_ui():
 
         has vbox
 
-        text "[terminal_engine.visual_noise()] GHOST TERMINAL // heat [terminal_engine.heat]% // jobs [len(terminal_engine.running_jobs)]":
-            color terminal_engine.prompt_color
-            size 20 + (terminal_engine.font_scale * 3)
-            xpadding 16
-            ypadding 8
+        frame:
+            background None
+            xfill True
+            padding (16, 8)
+
+            text "[terminal_engine.visual_noise()] GHOST TERMINAL // heat [terminal_engine.heat]% // jobs [len(terminal_engine.running_jobs)]":
+                color terminal_engine.prompt_color
+                size 20 + (terminal_engine.font_scale * 3)
 
         viewport:
             draggable True
             mousewheel True
-            yadjustment ui.adjustment(range=max(0, len(terminal_engine.output) * 24), value=max(0, len(terminal_engine.output) * 24))
+            yadjustment ui.adjustment(
+                range=max(0, len(terminal_engine.output) * 24),
+                value=max(0, len(terminal_engine.output) * 24)
+            )
             xfill True
             yfill True
 
-            vbox:
-                spacing 2
-                xpadding 16
-                ypadding 8
+            frame:
+                background None
+                xfill True
+                padding (16, 8)
 
-                for line in terminal_engine.output:
-                    text line:
-                        color terminal_engine.text_color
-                        size 17 + (terminal_engine.font_scale * 2)
+                vbox:
+                    spacing 2
+
+                    for line in terminal_engine.output:
+                        text line:
+                            color terminal_engine.text_color
+                            size 17 + (terminal_engine.font_scale * 2)
 
         frame:
             background "#000000"
