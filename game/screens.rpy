@@ -101,7 +101,7 @@ screen say(who, what):
     window:
         id "window"
 
-        background (None if phone_mode else Image("gui/textbox.png", xalign=0.5, yalign=1.0))
+        background (None if terminal_mode else Image("gui/textbox.png", xalign=0.5, yalign=1.0))
         xalign 0.5
         xfill True
         yalign gui.textbox_yalign
@@ -138,7 +138,7 @@ style window:
     ysize gui.textbox_height
 
     # background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
-    # background If(phone_mode, None, Image("gui/textbox.png", xalign=0.5, yalign=1.0))
+    # background If(terminal_mode, None, Image("gui/textbox.png", xalign=0.5, yalign=1.0))
 
 style namebox:
     xpos gui.name_xpos
