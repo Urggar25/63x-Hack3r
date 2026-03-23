@@ -4,6 +4,7 @@ init -2 python:
     import datetime
     import random
     import shlex
+    import renpy.store as store
 
     class TerminalEngine(object):
         def __init__(self):
@@ -41,8 +42,61 @@ init -2 python:
             self.heat = 12
             self.ghostlevel = 1
             self.victims = {
-                "nora": {"status": "infected", "data": ["messages"], "location": "Old Town"},
-                "jules": {"status": "scanned", "data": [], "location": "North Checkpoint"},
+                "nora": {
+                    "display_name": "Nora Vex",
+                    "status": "infected",
+                    "infection": 82,
+                    "heat": 48,
+                    "value": 9,
+                    "data": ["messages", "photos", "location"],
+                    "location": "Old Town",
+                    "job": "OnlyFanz Creator",
+                    "relationship": "Mariée (instable)",
+                    "tags": ["Mariée", "Endettée", "Créatrice"],
+                    "last_activity": "il y a 12 min",
+                    "connections": ["jules", "mika", "daria"],
+                    "timeline": [
+                        {"ts": "14:32", "type": "message", "text": "« je t'attends ce soir… »"},
+                        {"ts": "15:02", "type": "photo", "text": "Nouvelle photo intime"},
+                        {"ts": "15:28", "type": "search", "text": "divorce avocat"},
+                    ],
+                },
+                "jules": {
+                    "display_name": "Jules Mercer",
+                    "status": "scanned",
+                    "infection": 27,
+                    "heat": 22,
+                    "value": 5,
+                    "data": [],
+                    "location": "North Checkpoint",
+                    "job": "Barista chez CheapCoffee",
+                    "relationship": "Célibataire",
+                    "tags": ["Dépensier", "Insomniaque"],
+                    "last_activity": "il y a 43 min",
+                    "connections": ["nora"],
+                    "timeline": [
+                        {"ts": "13:05", "type": "call", "text": "Appel 08:22 avec Nora"},
+                        {"ts": "13:57", "type": "location", "text": "Quartier North Checkpoint"},
+                    ],
+                },
+                "mika": {
+                    "display_name": "Mika Sol",
+                    "status": "infected",
+                    "infection": 66,
+                    "heat": 73,
+                    "value": 7,
+                    "data": ["messages", "passwords"],
+                    "location": "Dockside",
+                    "job": "Analyste cyber (freelance)",
+                    "relationship": "En couple toxique",
+                    "tags": ["Hacker", "Paranoïaque"],
+                    "last_activity": "il y a 3 min",
+                    "connections": ["nora", "daria", "eon"],
+                    "timeline": [
+                        {"ts": "15:40", "type": "alert", "text": "Antivirus scan détecté"},
+                        {"ts": "15:44", "type": "message", "text": "Parle de cybersécurité dans ses DM"},
+                    ],
+                },
             }
             self.running_jobs = []
             self.echo_banner()
@@ -353,7 +407,21 @@ init -2 python:
                 self.push("usage: scan <email|phone|username>")
                 return
             handle = args[0].lower().replace("@", "_").replace(".", "_")
-            self.victims[handle] = {"status": "scanned", "data": [], "location": "unknown"}
+            self.victims[handle] = {
+                "display_name": handle.title(),
+                "status": "scanned",
+                "infection": random.randint(5, 25),
+                "heat": random.randint(10, 40),
+                "value": random.randint(2, 7),
+                "data": [],
+                "location": "unknown",
+                "job": "Inconnu",
+                "relationship": "Inconnu",
+                "tags": ["Nouveau"],
+                "last_activity": "à l'instant",
+                "connections": [],
+                "timeline": [{"ts": "maintenant", "type": "scan", "text": "Profil découvert par scan OSINT"}],
+            }
             self.fs["/"]["children"]["victims"]["children"][handle + ".txt"] = {"type": "file", "content": "Victim {} scanned.".format(handle)}
             self.push("target acquired: {}".format(handle))
 
@@ -376,6 +444,7 @@ init -2 python:
                 self.heat = min(100, self.heat + 2)
                 return
             self.victims[target]["status"] = "infected"
+            self.victims[target]["infection"] = min(100, self.victims[target].get("infection", 20) + random.randint(15, 35))
             self.push("infection success on {} via {}".format(target, method))
 
         def cmd_grab(self, args):
@@ -389,6 +458,7 @@ init -2 python:
             data = self._parse_flag(args, "--data", "messages")
             if data not in self.victims[target]["data"]:
                 self.victims[target]["data"].append(data)
+            self.victims[target]["infection"] = min(100, self.victims[target].get("infection", 20) + 6)
             self.heat = min(100, self.heat + 1)
             self.push("grabbed {} from {}".format(data, target))
 
@@ -418,8 +488,10 @@ init -2 python:
             self.push("keylogger {} {}".format("armed" if "--start" in args else "stopped", args[0]))
 
         def cmd_victims(self, args):
-            for k, v in sorted(self.victims.items()):
-                self.push("{} [{}] data:{}".format(k, v["status"], ",".join(v["data"]) or "none"))
+            for k, v in sorted(self.victims.items(), key=lambda item: item[1].get("infection", 0), reverse=True):
+                self.push("{} [{}] inf:{}% heat:{} data:{}".format(k, v["status"], v.get("infection", 0), v.get("heat", 0), ",".join(v["data"]) or "none"))
+            store.ghost_net_mode = True
+            renpy.restart_interaction()
 
         def cmd_profile(self, args):
             if not args:
@@ -431,6 +503,7 @@ init -2 python:
                 self.push("profile: target not found", is_error=True)
                 return
             self.push("target={} status={} location={} data={}".format(t, v["status"], v["location"], ",".join(v["data"]) or "none"))
+            store.ghost_net_selected = t
 
         def cmd_market(self, args):
             self.push("Shadow Market: use market buy rat_v3 | market list")
@@ -493,8 +566,23 @@ init -2 python:
                 return "~"
             return ""
 
+        def sorted_victim_keys(self):
+            return [k for k, _ in sorted(self.victims.items(), key=lambda item: item[1].get("infection", 0), reverse=True)]
+
+        def victim_heat_advice(self, victim):
+            heat = victim.get("heat", 0)
+            if heat >= 70:
+                return "Risque élevé: couper webcam 48h et réduire les actions actives."
+            if heat >= 45:
+                return "Risque modéré: espacer les grabs et éviter les scans agressifs."
+            return "Risque bas: fenêtre d'exploitation stable."
+
     terminal_engine = TerminalEngine()
     terminal_mode = True
+    ghost_net_mode = False
+    ghost_net_view = "table"
+    ghost_net_selected = "nora"
+    ghost_net_query = ""
 
     def terminal_submit():
         terminal_engine.run_input()
@@ -515,69 +603,81 @@ init -2 python:
 screen terminal_ui():
     zorder 200
     modal False
-
-    frame:
-        background "#020402"
-        xfill True
-        yfill True
-
-        has vbox
+    if not ghost_net_mode:
 
         frame:
-            background None
-            xfill True
-            padding (16, 8)
-
-            text "[terminal_engine.visual_noise()] GHOST TERMINAL // heat [terminal_engine.heat]% // jobs [len(terminal_engine.running_jobs)]":
-                color terminal_engine.prompt_color
-                size 20 + (terminal_engine.font_scale * 3)
-
-        viewport:
-            draggable True
-            mousewheel True
-            yadjustment ui.adjustment(
-                range=max(0, len(terminal_engine.output) * 24),
-                value=max(0, len(terminal_engine.output) * 24)
-            )
+            background "#020402"
             xfill True
             yfill True
+
+            has vbox
 
             frame:
                 background None
                 xfill True
                 padding (16, 8)
 
-                vbox:
-                    spacing 2
+                text "[terminal_engine.visual_noise()] GHOST TERMINAL // heat [terminal_engine.heat]% // jobs [len(terminal_engine.running_jobs)]":
+                    color terminal_engine.prompt_color
+                    size 20 + (terminal_engine.font_scale * 3)
 
-                    for line in terminal_engine.output:
-                        text line:
-                            color terminal_engine.text_color
+            viewport:
+                draggable True
+                mousewheel True
+                yadjustment ui.adjustment(
+                    range=max(0, len(terminal_engine.output) * 24),
+                    value=max(0, len(terminal_engine.output) * 24)
+                )
+                xfill True
+                yfill True
+
+                frame:
+                    background None
+                    xfill True
+                    padding (16, 8)
+
+                    vbox:
+                        spacing 2
+
+                        for line in terminal_engine.output:
+                            text line:
+                                color terminal_engine.text_color
+                                size 17 + (terminal_engine.font_scale * 2)
+
+                        text terminal_engine.composing_line() + "▌":
+                            color terminal_engine.input_color
                             size 17 + (terminal_engine.font_scale * 2)
 
-                    text terminal_engine.composing_line() + "▌":
+            frame:
+                background "#000000"
+                xfill True
+                ysize 52
+                xpadding 16
+                ypadding 8
+
+                hbox:
+                    spacing 8
+                    text terminal_engine.resolved_prompt():
+                        color terminal_engine.prompt_color
+                        size 18 + (terminal_engine.font_scale * 2)
+                        yalign 0.5
+
+                    input value VariableInputValue("terminal_engine.input") length 240:
                         color terminal_engine.input_color
-                        size 17 + (terminal_engine.font_scale * 2)
+                        caret "#66ff99"
+                        size 18 + (terminal_engine.font_scale * 2)
+                        yalign 0.5
 
-        frame:
-            background "#000000"
-            xfill True
-            ysize 52
-            xpadding 16
-            ypadding 8
-
-            hbox:
-                spacing 8
-                text terminal_engine.resolved_prompt():
-                    color terminal_engine.prompt_color
-                    size 18 + (terminal_engine.font_scale * 2)
-                    yalign 0.5
-
-                input value VariableInputValue("terminal_engine.input") length 240:
-                    color terminal_engine.input_color
-                    caret "#66ff99"
-                    size 18 + (terminal_engine.font_scale * 2)
-                    yalign 0.5
+    frame:
+        xalign 0.98
+        yalign 0.02
+        background "#081018cc"
+        xpadding 12
+        ypadding 6
+        textbutton ("TERMINAL" if ghost_net_mode else "GHOST NET [V]"):
+            text_size 16
+            text_color "#86faff"
+            action ToggleVariable("ghost_net_mode")
 
     key "K_RETURN" action Function(terminal_submit)
     key "K_KP_ENTER" action Function(terminal_submit)
@@ -586,3 +686,188 @@ screen terminal_ui():
     key "K_TAB" action Function(terminal_autocomplete)
     key "ctrl_K_r" action Function(terminal_engine.push, "reverse-i-search unavailable in demo: use history")
     key "K_F11" action Function(terminal_toggle_fullscreen)
+    key "K_v" action ToggleVariable("ghost_net_mode")
+
+
+screen ghost_net_ui():
+    zorder 205
+    modal False
+    if ghost_net_mode:
+        default graph_positions = {
+            "nora": (0.27, 0.32),
+            "jules": (0.58, 0.27),
+            "mika": (0.72, 0.52),
+            "daria": (0.40, 0.68),
+            "eon": (0.83, 0.38),
+        }
+
+        frame:
+            background "#05070d"
+            xfill True
+            yfill True
+
+            frame:
+                background "#0d1420"
+                xfill True
+                ysize 90
+                xpadding 18
+                ypadding 10
+
+                hbox:
+                    spacing 12
+                    xfill True
+                    yalign 0.5
+                    text "GHOST NET // SHADOW NEXUS":
+                        color "#7ff9ff"
+                        size 30
+                    text "Infected [len(terminal_engine.victims)] cibles // Heat global [terminal_engine.heat]%":
+                        color "#c9f6ff"
+                        size 17
+                    null width 40
+                    textbutton ("Mode Tableau" if ghost_net_view != "table" else "Mode Graphe"):
+                        action (SetVariable("ghost_net_view", "graph") if ghost_net_view == "table" else SetVariable("ghost_net_view", "table"))
+                        text_size 15
+                    textbutton "Retour terminal":
+                        action SetVariable("ghost_net_mode", False)
+                        text_size 15
+
+            if ghost_net_view == "table":
+                frame:
+                    background "#060a12"
+                    xfill True
+                    yfill True
+                    xpadding 14
+                    ypadding 14
+
+                    hbox:
+                        spacing 14
+                        textbutton "Heat > 50%":
+                            action SetVariable("ghost_net_query", "heat")
+                        textbutton "Infection < 30%":
+                            action SetVariable("ghost_net_query", "low_inf")
+                        textbutton "Reset filtres":
+                            action SetVariable("ghost_net_query", "")
+                        text "Recherche rapide (nom/tag) : [ghost_net_query if ghost_net_query else 'aucune']":
+                            color "#88adc4"
+
+                    viewport:
+                        draggable True
+                        mousewheel True
+                        scrollbars "vertical"
+                        xfill True
+                        yfill True
+
+                        vbox:
+                            spacing 8
+                            for key in terminal_engine.sorted_victim_keys():
+                                $ victim = terminal_engine.victims[key]
+                                if not ((ghost_net_query == "heat" and victim.get("heat", 0) <= 50) or (ghost_net_query == "low_inf" and victim.get("infection", 0) >= 30)):
+                                    button:
+                                        background "#0f1a2a"
+                                        hover_background "#12223a"
+                                        xfill True
+                                        xpadding 10
+                                        ypadding 8
+                                        action SetVariable("ghost_net_selected", key)
+
+                                        hbox:
+                                            spacing 18
+                                            text "[victim.get('display_name', key)]":
+                                                color "#ebf7ff"
+                                                size 20
+                                                xminimum 235
+                                            text "INF [victim.get('infection', 0)]%":
+                                                color "#7dffbb" if victim.get("infection", 0) < 50 else ("#ffc65a" if victim.get("infection", 0) < 80 else "#ff5e6a")
+                                                size 18
+                                                xminimum 130
+                                            text "HEAT [victim.get('heat', 0)]%":
+                                                color "#8be0ff" if victim.get("heat", 0) < 50 else "#ff62a8"
+                                                size 18
+                                                xminimum 130
+                                            text "Valeur ★[victim.get('value', 0)]":
+                                                color "#f5b7ff"
+                                                size 17
+                                                xminimum 110
+                                            text "[victim.get('last_activity', 'inconnue')]":
+                                                color "#91a8be"
+                                                size 16
+                                                xminimum 160
+                                            text ", ".join(victim.get("tags", [])):
+                                                color "#b4fbff"
+                                                size 16
+
+            else:
+                frame:
+                    background "#050a16"
+                    xfill True
+                    yfill True
+                    xpadding 20
+                    ypadding 20
+                    for key in terminal_engine.sorted_victim_keys():
+                        $ victim = terminal_engine.victims[key]
+                        $ pos = graph_positions.get(key, (random.random(), random.random()))
+                        frame:
+                            xpos int(config.screen_width * pos[0])
+                            ypos int(config.screen_height * pos[1])
+                            background "#121d2d"
+                            xpadding 14
+                            ypadding 8
+                            textbutton "[victim.get('display_name', key)]\nINF [victim.get('infection', 0)]%":
+                                action SetVariable("ghost_net_selected", key)
+                                text_color "#7ff9ff" if victim.get("heat", 0) < 50 else "#ff63ad"
+                                text_size 15
+
+        if ghost_net_selected in terminal_engine.victims:
+            $ sv = terminal_engine.victims[ghost_net_selected]
+            frame:
+                xalign 0.985
+                yalign 0.53
+                xmaximum 500
+                ymaximum 860
+                background "#0e1320ef"
+                xpadding 16
+                ypadding 14
+                vbox:
+                    spacing 9
+                    text "[sv.get('display_name', ghost_net_selected)]":
+                        color "#e8f8ff"
+                        size 28
+                    text "[sv.get('job', 'Inconnu')] // [sv.get('location', 'Unknown')]":
+                        color "#7bcde4"
+                    text "Statut relationnel: [sv.get('relationship', 'Inconnu')]":
+                        color "#b5d9ef"
+                    text "Infection [sv.get('infection', 0)]% | Heat [sv.get('heat', 0)]% | Valeur [sv.get('value', 0)]":
+                        color "#f3b2ff"
+                    text "Accès: mail [max(20, sv.get('infection', 0)-5)]% | social [max(10, sv.get('infection', 0)-25)]% | webcam [max(0, sv.get('infection', 0)-45)]%":
+                        color "#8effcf"
+                        size 15
+                    text "Keylogger: [ 'Oui' if sv.get('infection', 0) >= 40 else 'Non' ]":
+                        color "#7fe3ff"
+                        size 15
+                    text "Conseil risque: [terminal_engine.victim_heat_advice(sv)]":
+                        color "#ff86b5"
+                        size 15
+                    text "Timeline":
+                        color "#8cf6ff"
+                        size 19
+                    viewport:
+                        draggable True
+                        mousewheel True
+                        ymaximum 220
+                        vbox:
+                            spacing 4
+                            for event in sv.get("timeline", []):
+                                text "[event.get('ts', '--')] · [event.get('type', 'event')] · [event.get('text', '')]":
+                                    color "#d5e8ff"
+                                    size 14
+                    text "Connexions: [', '.join(sv.get('connections', [])) if sv.get('connections') else 'Aucune']":
+                        color "#8ab6cf"
+
+                    hbox:
+                        spacing 8
+                        textbutton "Upgrade infection":
+                            action Function(terminal_engine.push, "RAT upgrade lancé pour {}".format(ghost_net_selected))
+                        textbutton "Grab data":
+                            action Function(terminal_engine.push, "Data burst capturé sur {}".format(ghost_net_selected))
+                        textbutton "Spy live":
+                            action Function(terminal_engine.push, "Flux live ouvert sur {}".format(ghost_net_selected))
