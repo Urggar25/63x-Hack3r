@@ -5,17 +5,21 @@ While running game code:
     call screen ghostnet_v2_ui
   File "renpy/common/000statements.rpy", line 671, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
-  File "game/ghostnet_system.rpy", line 130, in execute
+  File "game/ghostnet_system.rpy", line 161, in execute
     screen ghostnet_v2_ui():
-  File "game/ghostnet_system.rpy", line 130, in execute
+  File "game/ghostnet_system.rpy", line 161, in execute
     screen ghostnet_v2_ui():
-  File "game/ghostnet_system.rpy", line 148, in execute
-    frame:
-  File "game/ghostnet_system.rpy", line 155, in execute
-    hbox:
   File "game/ghostnet_system.rpy", line 170, in execute
-    text "Appareil actif : [GHOSTNET_CHARACTER_DIRECTORY[ghostnet_selected_device]['speaker']]" color "#173042" size 20
-KeyError: 'josef'
+    if ghostnet_selected_victim in ghostnet_victims:
+  File "game/ghostnet_system.rpy", line 171, in execute
+    $ _ghostnet_sync = ghostnet_collect_visible_dialogue_photos(ghostnet_selected_device, ghostnet_selected_victim)
+  File "game/ghostnet_system.rpy", line 171, in <module>
+    $ _ghostnet_sync = ghostnet_collect_visible_dialogue_photos(ghostnet_selected_device, ghostnet_selected_victim)
+  File "game/ghostnet_system.rpy", line 114, in ghostnet_collect_visible_dialogue_photos
+    ghostnet_collect_photo_from_dialogue(chunk)
+  File "game/ghostnet_system.rpy", line 86, in ghostnet_collect_photo_from_dialogue
+    media_image = ghostnet_dialogue_media_image(dialogue_chunk)
+NameError: name 'ghostnet_dialogue_media_image' is not defined
 
 -- Full Traceback ------------------------------------------------------------
 
@@ -52,34 +56,23 @@ Full traceback:
     self.update()
   File "C:\Users\fasqu\Desktop\renpy\renpy\display\screen.py", line 700, in update
     self.screen.function(**self.scope)
-  File "game/ghostnet_system.rpy", line 130, in execute
+  File "game/ghostnet_system.rpy", line 161, in execute
     screen ghostnet_v2_ui():
-  File "game/ghostnet_system.rpy", line 130, in execute
+  File "game/ghostnet_system.rpy", line 161, in execute
     screen ghostnet_v2_ui():
-  File "game/ghostnet_system.rpy", line 148, in execute
-    frame:
-  File "game/ghostnet_system.rpy", line 155, in execute
-    hbox:
   File "game/ghostnet_system.rpy", line 170, in execute
-    text "Appareil actif : [GHOSTNET_CHARACTER_DIRECTORY[ghostnet_selected_device]['speaker']]" color "#173042" size 20
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2177, in _scope
-    return self.set_text(self.text_parameter, scope, self.substitute, update)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\text\text.py", line 2216, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 373, in substitute
-    s = interpolate(s, variables) # type: ignore
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Users\fasqu\Desktop\renpy\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1218, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Users\fasqu\Desktop\renpy\renpy\python.py", line 1211, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "<none>", line 1, in <module>
-KeyError: 'josef'
+    if ghostnet_selected_victim in ghostnet_victims:
+  File "game/ghostnet_system.rpy", line 171, in execute
+    $ _ghostnet_sync = ghostnet_collect_visible_dialogue_photos(ghostnet_selected_device, ghostnet_selected_victim)
+  File "game/ghostnet_system.rpy", line 171, in <module>
+    $ _ghostnet_sync = ghostnet_collect_visible_dialogue_photos(ghostnet_selected_device, ghostnet_selected_victim)
+  File "game/ghostnet_system.rpy", line 114, in ghostnet_collect_visible_dialogue_photos
+    ghostnet_collect_photo_from_dialogue(chunk)
+  File "game/ghostnet_system.rpy", line 86, in ghostnet_collect_photo_from_dialogue
+    media_image = ghostnet_dialogue_media_image(dialogue_chunk)
+NameError: name 'ghostnet_dialogue_media_image' is not defined
 
 Windows-10-10.0.26200 AMD64
 Ren'Py 8.3.7.25031702
 Phone 1.0
-Mon Mar 23 21:37:35 2026
+Mon Mar 23 22:19:48 2026

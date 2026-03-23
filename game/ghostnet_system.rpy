@@ -117,6 +117,9 @@ init python:
         if gallery:
             ghostnet_profile_photo_choices[character_id] = ghostnet_profile_photo_choices.get(character_id, 0) % len(gallery)
 
+    # -------------------------------------------------------------------
+    # Déclaration des images
+
     def ghostnet_dialogue_media_image(dialogue_chunk):
         speaker_id = dialogue_chunk.get("speaker_id")
         text = dialogue_chunk.get("text", "").lower()
@@ -125,7 +128,7 @@ init python:
             return None
 
         if "envoie photo" in text or "envoie la photo" in text or "t'envoie la photo" in text:
-            return "images/character/romie.png"
+            return "images/character/romie_pic001.png"
 
         return None
 
