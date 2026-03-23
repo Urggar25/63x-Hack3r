@@ -99,6 +99,8 @@ init -2 python:
                 },
             }
             self.running_jobs = []
+            self.browser_tabs = []
+            self.active_browser_tab = -1
             self.echo_banner()
 
         def echo_banner(self):
@@ -268,6 +270,22 @@ init -2 python:
                 "panic": self.cmd_panic,
                 "ghostmode": self.cmd_ghostmode,
                 "sleep": self.cmd_sleep,
+                "browse": self.cmd_browse,
+                "web": self.cmd_browse,
+                "net": self.cmd_browse,
+                "open": self.cmd_browse,
+                "tabs": self.cmd_tabs,
+                "switch": self.cmd_switch,
+                "close": self.cmd_close,
+                "refresh": self.cmd_refresh,
+                "read": self.cmd_read,
+                "reply": self.cmd_reply,
+                "search": self.cmd_site_search,
+                "dm": self.cmd_dm,
+                "post": self.cmd_post,
+                "transfer": self.cmd_transfer,
+                "buy": self.cmd_buy,
+                "leak": self.cmd_leak,
             }
 
         def execute(self, raw):
@@ -290,6 +308,8 @@ init -2 python:
             self.push("Core: ls/cd/cat/echo/clear/help/man/history/exit")
             self.push("Gameplay: scan infect(i) grab spy watch keylog victims profile market heat")
             self.push("Advanced: propagate deepfake erase script panic ghostmode")
+            self.push("Browser: browse/web/net/open tabs switch close refresh")
+            self.push("Site cmds: read/reply/search/dm/post/transfer/buy/leak")
 
         def cmd_man(self, args):
             if not args:
@@ -557,6 +577,336 @@ init -2 python:
         def cmd_sleep(self, args):
             self.push("sleep acknowledged (simulation only)")
 
+        def _browse_keyword_results(self, query):
+            q = (query or "").lower()
+            if any(k in q for k in ["phishing", "deepfake", "2fa", "tool"]):
+                return [
+                    ("Ghost Academy // Social Engineering Pack 2026", "Tutoriels internes: kits phishing, contournement MFA low-noise.", "https://ghost-academy.onion/ops/se-2026"),
+                    ("Shadow Market // Bundle deepfake", "Packs vocaux + générateur vidéo synthétique pour escroqueries ciblées.", "https://shadow-market.onion/list/deepfake-bundle"),
+                    ("LeakHub // Cases de compromission", "Retours d'expérience anonymes et scripts de collecte.", "https://leakhub.onion/thread/blackmirror-ops"),
+                ]
+            if any(k in q for k in ["xmail", "mail", "inbox"]):
+                return [
+                    ("Xmail Access Handbook", "Procédure d'accès boîte mail et exfiltration discrète.", "https://ghost-docs.onion/xmail-handbook"),
+                    ("Nora87 footprint", "Index social + email corrélé avec Fibook et Neobank.", "https://osint-grid.onion/profile/nora87"),
+                ]
+            return []
+
+        def _resolve_site(self, token):
+            site = (token or "").lower().strip()
+            aliases = {
+                "xmail": "xmail",
+                "fibook": "fibook",
+                "sin-tube": "sin-tube",
+                "sintube": "sin-tube",
+                "neobank": "neobank",
+                "darkmarket": "darkmarket",
+                "shadow-market": "darkmarket",
+                "shadowmarket": "darkmarket",
+                "leakhub": "leakhub",
+            }
+            return aliases.get(site)
+
+        def _active_tab(self):
+            if self.active_browser_tab < 0 or self.active_browser_tab >= len(self.browser_tabs):
+                return None
+            return self.browser_tabs[self.active_browser_tab]
+
+        def _add_tab(self, tab):
+            self.browser_tabs.append(tab)
+            self.active_browser_tab = len(self.browser_tabs) - 1
+
+        def _tab_label(self, tab):
+            label = tab.get("title", "Tab")
+            if tab.get("incognito"):
+                label = "⛶ " + label
+            return label
+
+        def browser_tab_line(self):
+            if not self.browser_tabs:
+                return "[Aucun onglet navigateur]"
+            chunks = []
+            for i, tab in enumerate(self.browser_tabs, start=1):
+                marker = "*" if (i - 1) == self.active_browser_tab else ""
+                chunks.append("[{}{}:{}]".format(marker, i, self._tab_label(tab)))
+            chunks.append("[X]")
+            return "  ".join(chunks)
+
+        def _update_ghost_profile(self, victim_key, data_key):
+            if victim_key in self.victims and data_key not in self.victims[victim_key]["data"]:
+                self.victims[victim_key]["data"].append(data_key)
+
+        def _site_tab(self, site, args, incognito=False):
+            if site == "xmail":
+                account = args[0] if args else "nora87"
+                lines = [
+                    "[Xmail - {}@shadowmail.net]".format(account),
+                    "Inbox (23) | Sent | Trash | Search: ____",
+                    "1. [URGENT] Facture impayée – 14/03/2026",
+                    "2. Alex : \"Tu viens ce soir ? 😏\" – 22:41",
+                    "3. Neobank: 'Code OTP: 481002' – 21:10",
+                    "→ Commandes: read 2 | reply 2 | search \"banque\"",
+                ]
+                return {
+                    "title": "Xmail - {}".format(account),
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.2,
+                    "lines": lines,
+                }
+            if site == "fibook":
+                user = args[0] if args else "nora87"
+                return {
+                    "title": "Fibook - @{}".format(user),
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.3,
+                    "lines": [
+                        "[Fibook - @nora_loves_cats]",
+                        "Fil d'actu ↓",
+                        "nora_loves_cats a posté une photo · il y a 47 min",
+                        "[mini-ASCII photo] (\\_/)\n( •.•)\n/ >❤️",
+                        "Commentaires : 7",
+                        "Messagerie : 3 non lus (utilise: dm)",
+                        "→ Commandes: dm | post \"texte\" | read 1",
+                    ],
+                }
+            if site == "sin-tube":
+                return {
+                    "title": "sin-tube",
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.4,
+                    "lines": [
+                        "[sin-tube // creator hub]",
+                        "Creator: nora_afterdark",
+                        "Subs actifs: 1 284 | Revenus 30j: 4 920€",
+                        "DM premium: 12 non lus",
+                        "→ Commandes: dm | read 1 | leak pack",
+                    ],
+                }
+            if site == "neobank":
+                return {
+                    "title": "Neobank",
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.5,
+                    "lines": [
+                        "[NeoBank Secure Banking]",
+                        "Compte: NORA VEX // Solde: 12 440.33€",
+                        "CB virtuelle: **** 0912",
+                        "Dernier virement: 520€ -> 'A. Mercer'",
+                        "⚠ Monitoring anti-fraude actif",
+                        "→ Commandes: transfer 250 mule_77 | search \"virement\"",
+                    ],
+                }
+            if site == "darkmarket":
+                return {
+                    "title": "Shadow Market",
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.5,
+                    "lines": [
+                        "[Shadow Market // darkmarket]",
+                        "Top listings:",
+                        "1) RAT v4 stealth kit",
+                        "2) Credential combo EU banks",
+                        "3) Deepfake voice pipeline",
+                        "→ Commandes: buy 1 | buy 2",
+                    ],
+                }
+            if site == "leakhub":
+                return {
+                    "title": "LeakHub",
+                    "kind": "site",
+                    "site": site,
+                    "victim": "nora",
+                    "incognito": incognito,
+                    "heat_rate": 0.35,
+                    "lines": [
+                        "[LeakHub // community drops]",
+                        "Thread: nora_loves_cats // 18 fichiers listés",
+                        "Nouveaux: IMG_2044.jpg, dm_export.zip",
+                        "Réputation uploader: +27",
+                        "→ Commandes: leak dm_export.zip | read 1",
+                    ],
+                }
+            return None
+
+        def _browse_log(self, message, heat_gain=0.2, incognito=False):
+            gain = max(0, heat_gain * (0.4 if incognito else 1.0))
+            self.heat = min(100, self.heat + gain)
+            self.push("[BROWSE] {}".format(message))
+
+        def cmd_browse(self, args):
+            if not args:
+                self.push("usage: browse [--incognito] <recherche|url|site>")
+                return
+            incognito = "--incognito" in args
+            clean_args = [a for a in args if a != "--incognito"]
+            if not clean_args:
+                self.push("browse: missing target", is_error=True)
+                return
+            token = clean_args[0]
+            site = self._resolve_site(token)
+            if site:
+                tab = self._site_tab(site, clean_args[1:], incognito=incognito)
+                self._add_tab(tab)
+                self._browse_log("Ouverture site '{}' ({})".format(site, "furtif" if incognito else "standard"), heat_gain=tab.get("heat_rate", 0.2), incognito=incognito)
+                self._update_ghost_profile("nora", "messages")
+                return
+            query = " ".join(clean_args).strip('"')
+            results = self._browse_keyword_results(query)
+            lines = ["[Recherche: {}]".format(query)]
+            if results:
+                lines.append("Résultats ({}):".format(len(results)))
+                for idx, item in enumerate(results, start=1):
+                    lines.append("{}. {}".format(idx, item[0]))
+                    lines.append("   {}".format(item[1]))
+                    lines.append("   {}".format(item[2]))
+            else:
+                lines.append("Aucun résultat pertinent sur le clearnet… essaie le darknet ou reformule.")
+            lines.append("→ Commandes: browse darkmarket | tabs | switch <n>")
+            self._add_tab(
+                {
+                    "title": "Recherche: {}".format(query[:28] + ("…" if len(query) > 28 else "")),
+                    "kind": "search",
+                    "query": query,
+                    "incognito": incognito,
+                    "heat_rate": 0.1,
+                    "lines": lines,
+                }
+            )
+            self._browse_log("Requête '{}' exécutée".format(query), heat_gain=0.1, incognito=incognito)
+
+        def cmd_tabs(self, args):
+            if not self.browser_tabs:
+                self.push("tabs: aucun onglet actif")
+                return
+            self.push("Tabs ouverts:")
+            for i, tab in enumerate(self.browser_tabs, start=1):
+                marker = "*" if (i - 1) == self.active_browser_tab else "-"
+                self.push("{} {}. {}".format(marker, i, self._tab_label(tab)))
+
+        def cmd_switch(self, args):
+            if not args:
+                self.push("usage: switch <index>")
+                return
+            try:
+                idx = int(args[0]) - 1
+            except Exception:
+                self.push("switch: index invalide", is_error=True)
+                return
+            if idx < 0 or idx >= len(self.browser_tabs):
+                self.push("switch: onglet inexistant", is_error=True)
+                return
+            self.active_browser_tab = idx
+            self.push("onglet actif -> {}".format(self._tab_label(self.browser_tabs[idx])))
+
+        def cmd_close(self, args):
+            if args and args[0] == "all":
+                self.browser_tabs = []
+                self.active_browser_tab = -1
+                self.push("tous les onglets fermés")
+                return
+            if self.active_browser_tab < 0 or self.active_browser_tab >= len(self.browser_tabs):
+                self.push("close: aucun onglet actif", is_error=True)
+                return
+            closed = self.browser_tabs.pop(self.active_browser_tab)
+            if not self.browser_tabs:
+                self.active_browser_tab = -1
+            else:
+                self.active_browser_tab = max(0, self.active_browser_tab - 1)
+            self.push("onglet fermé: {}".format(self._tab_label(closed)))
+
+        def cmd_refresh(self, args):
+            tab = self._active_tab()
+            if not tab:
+                self.push("refresh: aucun onglet actif", is_error=True)
+                return
+            self._browse_log("Actualisation {}".format(self._tab_label(tab)), heat_gain=tab.get("heat_rate", 0.2) * 0.4, incognito=tab.get("incognito", False))
+
+        def cmd_read(self, args):
+            tab = self._active_tab()
+            if not tab:
+                self.push("read: ouvre un onglet avec browse d'abord", is_error=True)
+                return
+            item = args[0] if args else "1"
+            site = tab.get("site")
+            if site in ["xmail", "fibook", "sin-tube", "leakhub"]:
+                self._browse_log("Lecture item {} sur {}".format(item, site), heat_gain=0.15, incognito=tab.get("incognito", False))
+                self._update_ghost_profile("nora", "messages")
+                return
+            self.push("read: non supporté sur cet onglet", is_error=True)
+
+        def cmd_reply(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") != "xmail":
+                self.push("reply: disponible seulement sur xmail", is_error=True)
+                return
+            self._browse_log("Réponse draft envoyée (spoof léger)", heat_gain=0.2, incognito=tab.get("incognito", False))
+
+        def cmd_site_search(self, args):
+            tab = self._active_tab()
+            if not tab:
+                self.push("search: aucun onglet actif", is_error=True)
+                return
+            query = " ".join(args).strip('"') if args else ""
+            self._browse_log("Recherche interne '{}' sur {}".format(query or "*", tab.get("title", "tab")), heat_gain=0.12, incognito=tab.get("incognito", False))
+
+        def cmd_dm(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") not in ["fibook", "sin-tube"]:
+                self.push("dm: disponible sur fibook/sin-tube", is_error=True)
+                return
+            self._browse_log("Lu 2 DM compromettants sur {}".format(tab.get("site")), heat_gain=0.24, incognito=tab.get("incognito", False))
+            self._update_ghost_profile("nora", "messages")
+
+        def cmd_post(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") != "fibook":
+                self.push("post: disponible sur fibook", is_error=True)
+                return
+            msg = " ".join(args).strip('"') if args else "(vide)"
+            self._browse_log("Post ghost publié: {}".format(msg[:40]), heat_gain=0.3, incognito=tab.get("incognito", False))
+
+        def cmd_transfer(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") != "neobank":
+                self.push("transfer: disponible sur neobank", is_error=True)
+                return
+            amount = args[0] if args else "0"
+            dest = args[1] if len(args) > 1 else "unknown_wallet"
+            self._browse_log("Virement simulation {}€ -> {}".format(amount, dest), heat_gain=0.45, incognito=tab.get("incognito", False))
+            self._update_ghost_profile("nora", "passwords")
+
+        def cmd_buy(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") != "darkmarket":
+                self.push("buy: disponible sur darkmarket", is_error=True)
+                return
+            item = args[0] if args else "1"
+            self._browse_log("Achat listing #{} sur Shadow Market".format(item), heat_gain=0.38, incognito=tab.get("incognito", False))
+
+        def cmd_leak(self, args):
+            tab = self._active_tab()
+            if not tab or tab.get("site") != "leakhub":
+                self.push("leak: disponible sur leakhub", is_error=True)
+                return
+            target = args[0] if args else "bundle.zip"
+            self._browse_log("Exfiltration publiée: {}".format(target), heat_gain=0.42, incognito=tab.get("incognito", False))
+            self._update_ghost_profile("nora", "photos")
+
         def visual_noise(self):
             if self.heat > 80:
                 return "▒▒"
@@ -620,6 +970,37 @@ screen terminal_ui():
                 text "[terminal_engine.visual_noise()] GHOST TERMINAL // heat [terminal_engine.heat]% // jobs [len(terminal_engine.running_jobs)]":
                     color terminal_engine.prompt_color
                     size 20 + (terminal_engine.font_scale * 3)
+
+            frame:
+                background "#0dbcd744"
+                xfill True
+                ysize 2
+
+            frame:
+                background "#030809"
+                xfill True
+                xpadding 16
+                ypadding 5
+
+                text "[terminal_engine.browser_tab_line()]":
+                    color "#7ff9ff"
+                    size 15 + (terminal_engine.font_scale * 2)
+
+            if terminal_engine.active_browser_tab >= 0 and terminal_engine.active_browser_tab < len(terminal_engine.browser_tabs):
+                $ active_tab = terminal_engine.browser_tabs[terminal_engine.active_browser_tab]
+                frame:
+                    background "#09110f"
+                    xfill True
+                    ymaximum 220
+                    xpadding 16
+                    ypadding 10
+
+                    vbox:
+                        spacing 2
+                        for tab_line in active_tab.get("lines", []):
+                            text tab_line:
+                                color "#66ff99"
+                                size 16 + (terminal_engine.font_scale * 2)
 
             viewport:
                 draggable True
