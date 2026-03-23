@@ -8,11 +8,11 @@ init python:
     ]
 
     GHOSTNET_GALLERY_LIBRARY = {
-        "josef": [
+        "romie": [
             {"id": "josef_01", "label": "Selfie terminal", "bg": "#9dc0df", "fg": "#214667"},
             {"id": "josef_02", "label": "Photo badge", "bg": "#c9ddf1", "fg": "#2b587b"},
         ],
-        "cassandra": [
+        "bryonn": [
             {"id": "cassandra_01", "label": "Sourire néon", "bg": "#e6c7f4", "fg": "#6f3a8a"},
             {"id": "cassandra_02", "label": "Profil marché", "bg": "#f2d8ff", "fg": "#7b4a95"},
         ],
@@ -93,11 +93,11 @@ init python:
 
 default ghostnet_active_module = "Discussion"
 default ghostnet_selected_victim = "DISC-13-04"
-default ghostnet_selected_device = "josef"
+default ghostnet_selected_device = "romie"
 default ghostnet_unlocked_tags = set()
 default ghostnet_profile_photo_choices = {
-    "josef": 0,
-    "cassandra": 0,
+    "romie": 0,
+    "bryonn": 0,
 }
 default ghostnet_victims = ghostnet_build_victims()
 

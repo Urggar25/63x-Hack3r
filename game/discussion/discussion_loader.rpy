@@ -1,7 +1,7 @@
 init -2 python:
     GHOSTNET_CHARACTER_DIRECTORY = {
-        "josef": {"speaker": "Josef Langley", "default_side": "right", "device_name": "Terminal Josef"},
-        "cassandra": {"speaker": "Cassandra Watergate", "default_side": "left", "device_name": "Cloud Cassandra"},
+        "romie": {"speaker": "Romie Guillet", "default_side": "right", "device_name": "Mon X-Phone"},
+        "bryonn": {"speaker": "Bryonn Guillet", "default_side": "left", "device_name": "X-Phone de Bryonn"},
         "system": {"speaker": "Système", "default_side": "center"},
     }
 
