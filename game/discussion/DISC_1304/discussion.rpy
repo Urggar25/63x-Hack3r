@@ -8,6 +8,10 @@ init -1 python:
         summary="Conversation interceptée. Défilement manuel en mode lecture.",
         day=JOUR_DISC_1304,
         participants=["josef", "cassandra"],
+        device_owner="josef",
+        unlock_tag="TAG:CARTE_PLATINUM",
+        unlocks_discussions=["DISC-21-04"],
+        unlocks_content=["Dossier achats Bonton"],
         entries=[
             dialogue("josef", "Salut, toi."),
             dialogue("cassandra", "Coucou jossi :)"),
