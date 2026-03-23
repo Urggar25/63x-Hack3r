@@ -1,13 +1,25 @@
 init -2 python:
     GHOSTNET_CHARACTER_DIRECTORY = {
-        "josef": {"speaker": "Josef Langley", "default_side": "right"},
-        "cassandra": {"speaker": "Cassandra Watergate", "default_side": "left"},
+        "josef": {"speaker": "Josef Langley", "default_side": "right", "device_name": "Terminal Josef"},
+        "cassandra": {"speaker": "Cassandra Watergate", "default_side": "left", "device_name": "Cloud Cassandra"},
         "system": {"speaker": "Système", "default_side": "center"},
     }
 
     ghostnet_discussions = {}
 
-    def ghostnet_register_discussion(discussion_id, name, summary, day, participants, entries):
+    def ghostnet_register_discussion(
+        discussion_id,
+        name,
+        summary,
+        day,
+        participants,
+        entries,
+        device_owner,
+        unlock_tag=None,
+        unlock_requires=None,
+        unlocks_discussions=None,
+        unlocks_content=None,
+    ):
         ghostnet_discussions[discussion_id] = {
             "name": name,
             "id": discussion_id,
@@ -15,6 +27,11 @@ init -2 python:
             "day": day,
             "participants": participants,
             "dialogues": entries,
+            "device_owner": device_owner,
+            "unlock_tag": unlock_tag,
+            "unlock_requires": list(unlock_requires or []),
+            "unlocks_discussions": list(unlocks_discussions or []),
+            "unlocks_content": list(unlocks_content or []),
         }
 
     def ghostnet_dialogue_builder(day):
@@ -44,6 +61,11 @@ init -2 python:
                 "id": discussion_id,
                 "summary": discussion_data["summary"],
                 "participants": discussion_data["participants"],
+                "device_owner": discussion_data["device_owner"],
+                "unlock_tag": discussion_data["unlock_tag"],
+                "unlock_requires": discussion_data["unlock_requires"],
+                "unlocks_discussions": discussion_data["unlocks_discussions"],
+                "unlocks_content": discussion_data["unlocks_content"],
                 "last_activity": last_activity,
                 "visible_count": initial_count,
                 "dialogues": dialogues,
