@@ -152,6 +152,9 @@ init -2 python:
             self.history_cursor = max(0, min(len(self.history) - 1, self.history_cursor + direction))
             self.input = self.history[self.history_cursor]
 
+        def composing_line(self):
+            return "{}{}".format(self.resolved_prompt(), self.input or "")
+
         def autocomplete(self):
             chunk = (self.input or "").strip()
             if not chunk:
@@ -551,6 +554,10 @@ screen terminal_ui():
                         text line:
                             color terminal_engine.text_color
                             size 17 + (terminal_engine.font_scale * 2)
+
+                    text terminal_engine.composing_line() + "▌":
+                        color terminal_engine.input_color
+                        size 17 + (terminal_engine.font_scale * 2)
 
         frame:
             background "#000000"
