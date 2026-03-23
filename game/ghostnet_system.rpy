@@ -39,82 +39,16 @@ init python:
 
 
 default ghostnet_active_module = "Lecteur"
-default ghostnet_selected_victim = "session_13_avr"
+default ghostnet_selected_victim = "DISC-13-04"
 default ghostnet_avatar_choices = {
     "josef": 0,
     "cassandra": 1,
 }
-default ghostnet_victims = {
-    "session_13_avr": {
-        "name": "SESSION ENTRANTE",
-        "id": "DISC-13-04",
-        "summary": "Conversation interceptée. Défilement manuel en mode lecture.",
-        "participants": ["josef", "cassandra"],
-        "last_activity": "13 avr.",
-        "visible_count": 1,
-        "dialogues": [
-            {
-                "speaker_id": "josef",
-                "speaker": "Josef Langley",
-                "side": "right",
-                "date": "13 avr.",
-                "text": "Salut, toi.",
-            },
-            {
-                "speaker_id": "cassandra",
-                "speaker": "Cassandra Watergate",
-                "side": "left",
-                "date": "13 avr.",
-                "text": "Coucou jossi :)",
-            },
-            {
-                "speaker_id": "josef",
-                "speaker": "Josef Langley",
-                "side": "right",
-                "date": "13 avr.",
-                "text": "Ma carte de crédit a disparu. J'imagine que tu l'as prise ?",
-            },
-            {
-                "speaker_id": "cassandra",
-                "speaker": "Cassandra Watergate",
-                "side": "left",
-                "date": "13 avr.",
-                "text": "euuh... bien vu Sherlock !",
-            },
-            {
-                "speaker_id": "cassandra",
-                "speaker": "Cassandra Watergate",
-                "side": "left",
-                "date": "13 avr.",
-                "text": "Je suis en train d'acheter tout Bonton avec cette carte platinum que j'ai prise sur ton bureau....",
-            },
-            {
-                "speaker_id": "cassandra",
-                "speaker": "Cassandra Watergate",
-                "side": "left",
-                "date": "13 avr.",
-                "text": "tu ne peux plus m'arrêter !!",
-            },
-            {
-                "speaker_id": "josef",
-                "speaker": "Josef Langley",
-                "side": "right",
-                "date": "13 avr.",
-                "text": "Tu as de la chance, tes folies ne me dérangent pas, tant que tu passes prendre du vin pour le dîner.",
-            },
-            {
-                "speaker_id": "system",
-                "speaker": "Système",
-                "side": "center",
-                "date": "13 avr.",
-                "text": "Session close.",
-            },
-        ],
-    },
-}
+default ghostnet_victims = ghostnet_build_victims()
 
-screen ghostnet_avatar_preview(character_id, display_name):
+screen ghostnet_avatar_preview(character_id):
     $ style_data = ghostnet_avatar_style(character_id)
+    $ display_name = GHOSTNET_CHARACTER_DIRECTORY[character_id]["speaker"]
 
     frame:
         background style_data["bg"]
@@ -150,6 +84,9 @@ screen ghostnet_v2_ui():
     $ victim = ghostnet_victims[ghostnet_selected_victim]
     $ visible_dialogues = ghostnet_visible_dialogues(ghostnet_selected_victim)
     $ all_loaded = victim["visible_count"] >= len(victim["dialogues"])
+
+    if not all_loaded:
+        key "dismiss" action Function(ghostnet_next_dialogue, ghostnet_selected_victim)
 
     add Solid("#d5e7f2")
 
@@ -198,8 +135,8 @@ screen ghostnet_v2_ui():
                 text "[victim['summary']]" color "#2d5168" size 17
 
                 text "Profils participants" color "#1a3a52" size 28
-                use ghostnet_avatar_preview("josef", "Josef Langley")
-                use ghostnet_avatar_preview("cassandra", "Cassandra Watergate")
+                for participant in victim["participants"]:
+                    use ghostnet_avatar_preview(participant)
 
                 frame:
                     background "#d4e4f2"
@@ -209,9 +146,9 @@ screen ghostnet_v2_ui():
                     vbox:
                         spacing 4
                         text "Ajout de dialogues :" color "#1b3b51" size 18
-                        text "• Les messages sont stockés dans ghostnet_victims['session_13_avr']['dialogues']." color "#1b3b51" size 15
-                        text "• L'ordre de la liste = ordre exact d'affichage." color "#1b3b51" size 15
-                        text "• Un clic sur “Dialogue suivant” avance d'une ligne, jamais aléatoire." color "#1b3b51" size 15
+                        text "• Les messages sont stockés dans game/discussion/DISC_XXXX/discussion.rpy." color "#1b3b51" size 15
+                        text "• Utilisez une variable de jour + dialogue('personnage', 'texte')." color "#1b3b51" size 15
+                        text "• Un clic du joueur affiche le dialogue suivant en séquence." color "#1b3b51" size 15
 
         frame:
             background "#f1f7fc"
@@ -269,8 +206,7 @@ screen ghostnet_v2_ui():
                         spacing 15
                         text "Dernière activité : [victim['last_activity']]" color "#1b3b51" size 16
                         if not all_loaded:
-                            textbutton "Dialogue suivant":
-                                action Function(ghostnet_next_dialogue, ghostnet_selected_victim)
+                            text "Cliquez pour afficher le dialogue suivant." color "#315976" size 16
                         else:
                             text "Tous les messages sont affichés." color "#315976" size 16
                         textbutton "Quitter simulation" action Return()
