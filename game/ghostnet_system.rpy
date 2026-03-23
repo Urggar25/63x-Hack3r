@@ -127,7 +127,7 @@ init python:
         if speaker_id != "romie":
             return None
 
-        if "envoie photo" in text or "envoie la photo" in text or "t'envoie la photo" in text:
+        if "[romie_pic001.png]" in text:
             return "images/character/romie_pic001.png"
 
         return None
