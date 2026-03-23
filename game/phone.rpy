@@ -244,12 +244,10 @@ init -1 python:
 
     def register_spy_target(person_name):
         """Registers a person as infected in the in-game SpyCk3r app."""
-        global spyck3r_targets, current_spy_target, spyck3r_infected_at
+        global spyck3r_targets, spyck3r_infected_at
         if person_name not in spyck3r_targets:
             spyck3r_targets.append(person_name)
             spyck3r_infected_at[person_name] = _phone_global_message_counter + 1
-            if current_spy_target is None:
-                current_spy_target = person_name
         renpy.restart_interaction()
 
     def set_spy_target(person_name):
@@ -361,10 +359,12 @@ init -1 python:
             narrator.add_history(kind="adv", who=sender, what="Sent a photo.")
         renpy.checkpoint()
         if do_pause and phone_config["pause"]["do_pause"]:
+            while current_phone_app != "messages":
+                renpy.pause(0.1, hard=True)
             if phone_config["pause"]["pause_time"]:
-                renpy.pause(phone_config["pause"]["pause_length"])
+                renpy.pause(phone_config["pause"]["pause_length"], hard=True)
             else:
-                renpy.pause()
+                renpy.pause(hard=True)
 
     # basically clear notifs / mark as read for all
     def clear_notifications():
@@ -484,9 +484,12 @@ init -1 python:
         """
         # choices should be a list of tuples, like:
         # [("Choice Text 1", Jump("response_label_1")), ("Choice Text 2", Jump("response_label_2"))]
-        global phone_choice_options, phone_choice_channel
+        global phone_choice_options, phone_choice_channel, current_phone_app, current_phone_view, disable_phone_menu_switch
         phone_choice_options = choices
         phone_choice_channel = channel_name
+        current_phone_app = "messages"
+        current_phone_view = channel_name
+        disable_phone_menu_switch = True
         renpy.ui.interact()  # make the game wait for the user..
 
     # gets the last message to show in the phone preview

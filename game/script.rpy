@@ -75,24 +75,31 @@ label start:
     $ switch_channel_view("ops_feed")
     $ send_phone_message("NEXUS", "La charge virale peut se propager à ses contacts. Choisis la prochaine cible.", "ops_feed")
 
-    menu:
-        "Quelle cible infecter via Nora ?"
+    $ present_phone_choices([
+        ("Cibler Jules", "Infecte Jules, chauffeur clandestin.", Jump("infect_jules_choice")),
+        ("Cibler Imani", "Infecte Docteure Imani, clinique de fortune.", Jump("infect_imani_choice"))
+    ], "ops_feed")
+    jump post_target_choice
 
-        "Jules, chauffeur de transport clandestin":
-            $ infect_device("Nora Vex", "Jules Rane", "jules_thread", "Relais // Jules Rane", ["Jules Rane", "Nora Vex"], "phone/icons/avery.png")
-            $ send_infection_trace("Nora Vex", "Jules Rane", "jules_thread")
-            $ send_phone_message("Jules Rane", "J'ai livré le colis près du checkpoint militaire. Personne ne m'a suivi.", "jules_thread")
-            $ send_phone_message("Nora Vex", "Garde ton calme. Les drones tournent toute la nuit.", "jules_thread")
-            $ send_phone_message("Daemon", "Nouveau carnet d'adresses exfiltré depuis Jules Rane.", "jules_thread")
-            $ send_phone_message("NEXUS", "Bon choix. Les itinéraires de contrebande valent cher.", "ops_feed")
+label infect_jules_choice:
+    $ infect_device("Nora Vex", "Jules Rane", "jules_thread", "Relais // Jules Rane", ["Jules Rane", "Nora Vex"], "phone/icons/avery.png")
+    $ send_infection_trace("Nora Vex", "Jules Rane", "jules_thread")
+    $ send_phone_message("Jules Rane", "J'ai livré le colis près du checkpoint militaire. Personne ne m'a suivi.", "jules_thread")
+    $ send_phone_message("Nora Vex", "Garde ton calme. Les drones tournent toute la nuit.", "jules_thread")
+    $ send_phone_message("Daemon", "Nouveau carnet d'adresses exfiltré depuis Jules Rane.", "jules_thread")
+    $ send_phone_message("NEXUS", "Bon choix. Les itinéraires de contrebande valent cher.", "ops_feed")
+    jump post_target_choice
 
-        "Docteure Imani, clinique de fortune":
-            $ infect_device("Nora Vex", "Docteure Imani", "imani_thread", "Relais // Docteure Imani", ["Docteure Imani", "Nora Vex"], "phone/icons/study_buddies.png")
-            $ send_infection_trace("Nora Vex", "Docteure Imani", "imani_thread")
-            $ send_phone_message("Docteure Imani", "La réserve d'antiviraux est vide. Les enfants de la zone rouge rechutent.", "imani_thread")
-            $ send_phone_message("Nora Vex", "Je peux tenter le marché noir, mais les prix ont triplé.", "imani_thread")
-            $ send_phone_message("Daemon", "Dossiers médicaux chiffrés copiés. Déchiffrement en tâche de fond.", "imani_thread")
-            $ send_phone_message("NEXUS", "Bon choix. Les données biométriques ouvrent toutes les portes.", "ops_feed")
+label infect_imani_choice:
+    $ infect_device("Nora Vex", "Docteure Imani", "imani_thread", "Relais // Docteure Imani", ["Docteure Imani", "Nora Vex"], "phone/icons/study_buddies.png")
+    $ send_infection_trace("Nora Vex", "Docteure Imani", "imani_thread")
+    $ send_phone_message("Docteure Imani", "La réserve d'antiviraux est vide. Les enfants de la zone rouge rechutent.", "imani_thread")
+    $ send_phone_message("Nora Vex", "Je peux tenter le marché noir, mais les prix ont triplé.", "imani_thread")
+    $ send_phone_message("Daemon", "Dossiers médicaux chiffrés copiés. Déchiffrement en tâche de fond.", "imani_thread")
+    $ send_phone_message("NEXUS", "Bon choix. Les données biométriques ouvrent toutes les portes.", "ops_feed")
+    jump post_target_choice
+
+label post_target_choice:
 
     $ create_phone_channel("spread_map", "Propagation // Carte virale", ["Daemon", phone_config["phone_player_name"]], "phone/icon.png", is_group=True)
     $ send_phone_message("", "Synthèse automatique", "spread_map", 1)
