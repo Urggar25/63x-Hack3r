@@ -244,7 +244,10 @@ screen ghostnet_v2_ui():
             null width 30
             for module in GHOSTNET_MODULES:
                 textbutton module:
-                    action Function(ghostnet_set_module, module)
+                    action [
+                        Function(ghostnet_set_module, module),
+                        SetScreenVariable("dialogue_scroll", ui.adjustment(value=1.0, range=1.0)),
+                    ]
                     background ("#1e3e56" if ghostnet_active_module == module else "#4f6c80")
                     text_color "#e8f4ff"
                     text_size 18
@@ -287,7 +290,10 @@ screen ghostnet_v2_ui():
                                 $ item = ghostnet_victims[discussion_id]
                                 $ unread = ghostnet_unread(discussion_id)
                                 button:
-                                    action Function(ghostnet_select_victim, discussion_id)
+                                    action [
+                                        Function(ghostnet_select_victim, discussion_id),
+                                        SetScreenVariable("dialogue_scroll", ui.adjustment(value=1.0, range=1.0)),
+                                    ]
                                     background ("#c7dff1" if ghostnet_selected_victim == discussion_id else "#dcebf7")
                                     xfill True
                                     xpadding 10
@@ -338,7 +344,10 @@ screen ghostnet_v2_ui():
                                             text "Photo de profil active" color "#2c5b77" size 14
                                         else:
                                             textbutton "Appliquer cette photo":
-                                                action Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"])
+                                                action [
+                                                    Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"]),
+                                                    SetScreenVariable("dialogue_scroll", ui.adjustment(value=1.0, range=1.0)),
+                                                ]
                                                 background "#2e5a78"
                                                 text_color "#eef7ff"
                                                 text_size 14
