@@ -11,43 +11,29 @@ init python:
                 "source": "Messages",
                 "speaker": victim["name"],
                 "side": "left",
-                "text": "N'en parle pas à Lena. On se voit au Blue Iris Lounge à 22h.",
-                "extract": {"person": "Lena", "location": "Blue Iris Lounge", "sensitive": "secret relationnel"}
+                "text": "Toujours pas remboursée du bug promo de ce soir, ça me rend folle.",
+                "extract": {"sensitive": "frustration achat"}
             },
             {
-                "source": "Mails",
-                "speaker": "Xmail",
+                "source": "Messages",
+                "speaker": "Bryonn",
                 "side": "right",
-                "text": "Relance cabinet Veld & Co : facture impayée, délai 48h.",
-                "extract": {"money": "Facture impayée", "sensitive": "dette"}
-            },
-            {
-                "source": "Réseaux",
-                "speaker": victim["name"],
-                "side": "left",
-                "text": "Story publiée depuis Novagen Tower. #nightshift",
-                "extract": {"location": "Novagen Tower"}
-            },
-            {
-                "source": "Photos",
-                "speaker": "Galerie sync",
-                "side": "right",
-                "text": "Photo intime détectée (miroir + plaque rue visible).",
-                "extract": {"nsfw": "photo_intime", "location": "Rue Cobalt"}
+                "text": "Rentre tranquille, je livre mon dernier colis et j'arrive.",
+                "extract": {"person": "Bryonn"}
             },
             {
                 "source": "Localisation",
                 "speaker": "GeoPing",
-                "side": "right",
-                "text": "07:42 domicile -> 08:31 Station Nord -> 09:02 Novagen.",
-                "extract": {"location": "Routine matinale"}
+                "side": "left",
+                "text": "Sortie NeoWear Bloc 9 -> arrêt tram ligne B.",
+                "extract": {"location": "NeoWear Bloc 9"}
             },
             {
-                "source": "Webcam",
-                "speaker": "Transcription micro",
+                "source": "Messages",
+                "speaker": victim["name"],
                 "side": "right",
-                "text": "Si Joseph apprend ça, je suis ruinée.",
-                "extract": {"person": "Joseph", "sensitive": "peur d'exposition"}
+                "text": "Le QR 60% était un fake... 89 crédits perdus pour rien.",
+                "extract": {"money": "89 crédits"}
             },
         ]
         chunk = dict(random.choice(candidates))
@@ -124,47 +110,85 @@ init python:
         elif action_name == "cooldown":
             victim["heat"] = max(0, victim["heat"] - 12)
 
+    def ghostnet_reveal_followup(victim_id):
+        victim = ghostnet_victims[victim_id]
+        if victim.get("followup_revealed"):
+            return
 
-default ghostnet_running = True
+        followup_chunks = [
+            {"id": ghostnet_chunk_counter[0] + 0, "source": "Messages", "speaker": "Romie Guillet", "side": "left", "ts": "19:43", "text": "Regarde la photo cabine. Le top tombe super bien.", "extract": {"nsfw": "selfie cabine", "location": "NeoWear Bloc 9"}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 1, "source": "Photos", "speaker": "Flux média", "side": "right", "ts": "19:43", "text": "Photo jointe affichée dans le flux (cabine NeoWear, lumière froide).", "extract": {"location": "NeoWear Bloc 9"}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 2, "source": "Messages", "speaker": "Romie Guillet", "side": "left", "ts": "19:44", "text": "Je voulais le garder pour ce soir quand tu rentres.", "extract": {"person": "Bryonn"}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 3, "source": "Messages", "speaker": "Romie Guillet", "side": "left", "ts": "19:44", "text": "Là je suis juste crevée et vénère de la promo cassée.", "extract": {"sensitive": "fatigue"}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 4, "source": "Messages", "speaker": "Romie Guillet", "side": "left", "ts": "19:45", "text": "Tu finis à quelle heure ?", "extract": {}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 5, "source": "Messages", "speaker": "Bryonn", "side": "right", "ts": "19:45", "text": "Dans 45 min. Rentre direct.", "extract": {"person": "Bryonn"}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 6, "source": "Messages", "speaker": "Bryonn", "side": "right", "ts": "19:46", "text": "Garde le top, on se pose tranquille.", "extract": {}, "tagged": False},
+            {"id": ghostnet_chunk_counter[0] + 7, "source": "Messages", "speaker": "Système", "side": "right", "ts": "19:46", "text": "Capture terminée : conversation chiffrée ensuite.", "extract": {}, "tagged": False},
+        ]
+        ghostnet_chunk_counter[0] += len(followup_chunks)
+        victim["chunks"].extend(followup_chunks)
+        victim["followup_revealed"] = True
+        victim["heat"] = min(100, victim["heat"] + 3)
+        victim["last_activity"] = "19:46"
+
+
+default ghostnet_running = False
 default ghostnet_active_module = "Lecteur"
 default ghostnet_active_tab = "Messages"
-default ghostnet_selected_victim = "cassandra"
-default ghostnet_chunk_counter = [1]
+default ghostnet_selected_victim = "romie"
+default ghostnet_chunk_counter = [3]
 default ghostnet_victims = {
-    "cassandra": {
-        "name": "CASSANDRA WATERGATE",
-        "dob": "13 septembre 1992",
-        "address": "District Arcadia, Mégalopole 7",
-        "job": "Avocate corporate",
-        "relation": "En couple avec Josef Langley",
-        "income": "7 400 crédits/mois (estimé)",
-        "vices": ["sexting", "dette"],
-        "infection": 58,
-        "heat": 34,
-        "mail": 66,
-        "social": 73,
-        "webcam": 45,
-        "mic": 54,
-        "geo": 80,
-        "relations": ["Josef Langley", "Nina Maternova", "Juliet Kerrington"],
+    "romie": {
+        "name": "ROMIE GUILLET",
+        "dob": "Inconnu (24 ans estimés)",
+        "address": "Inconnue",
+        "job": "Inconnu",
+        "relation": "Inconnue",
+        "income": "Inconnu",
+        "vices": [],
+        "infection": 17,
+        "heat": 22,
+        "mail": 8,
+        "social": 14,
+        "webcam": 4,
+        "mic": 7,
+        "geo": 19,
+        "relations": [],
         "graph_nodes": [
-            {"name": "Cassandra", "role": "Cible", "x": 48, "y": 55},
-            {"name": "Josef", "role": "Relation", "x": 20, "y": 25},
-            {"name": "Nina", "role": "Amie", "x": 75, "y": 24},
-            {"name": "Juliet", "role": "Collègue", "x": 23, "y": 80},
-            {"name": "Abraham", "role": "Client", "x": 78, "y": 79},
+            {"name": "Romie", "role": "Cible", "x": 48, "y": 55},
         ],
-        "vault": 2,
-        "last_activity": "09:11",
+        "vault": 0,
+        "followup_revealed": False,
+        "last_activity": "19:42",
         "chunks": [
             {
                 "id": 0,
                 "source": "Messages",
-                "speaker": "Cassandra Watergate",
+                "speaker": "Romie Guillet",
                 "side": "left",
-                "ts": "09:11",
-                "text": "Coucou Jossi :) La carte platinum est sur ton bureau.",
-                "extract": {"person": "Josef", "sensitive": "intimité financière"},
+                "ts": "19:42",
+                "text": "Putain Bryonn je suis dég. J'ai scanné un QR -60% au NeoWear et ça a buggué. J'ai payé 89 crédits plein pot.",
+                "extract": {"person": "Bryonn", "location": "NeoWear Bloc 9", "money": "89 crédits"},
+                "tagged": False,
+            },
+            {
+                "id": 1,
+                "source": "Messages",
+                "speaker": "Bryonn",
+                "side": "right",
+                "ts": "19:42",
+                "text": "Encore un faux code promo... Ils trackent tout. T'as quand même essayé l'outfit ?",
+                "extract": {"person": "Bryonn"},
+                "tagged": False,
+            },
+            {
+                "id": 2,
+                "source": "Messages",
+                "speaker": "Romie Guillet",
+                "side": "left",
+                "ts": "19:42",
+                "text": "Oui, et il rend super bien. Dommage que la promo n'ait pas marché.",
+                "extract": {"sensitive": "outfit essayé"},
                 "tagged": False,
             }
         ],
@@ -192,7 +216,7 @@ screen ghostnet_v2_ui():
         hbox:
             xfill True
             spacing 16
-            text "23 mars 2030" color "#173042" size 28
+            text "23 mars 2026" color "#173042" size 28
             text "| GHOSTNET / THE EYE" color "#28465d" size 24
             null width 30
             for module in GHOSTNET_MODULES:
@@ -348,6 +372,9 @@ screen ghostnet_v2_ui():
                         text "Victime active : [victim['name']]" color "#1b3b51" size 16
                         text "Dernière activité : [victim['last_activity']]" color "#1b3b51" size 16
                         text "NSFW Vault : [victim['vault']] éléments" color "#5d1f36" size 16
+                        if not victim.get("followup_revealed", False):
+                            textbutton "Lire la suite (8 messages)":
+                                action Function(ghostnet_reveal_followup, ghostnet_selected_victim)
                         textbutton "Quitter simulation" action Return()
 
 label ghostnet_demo:
