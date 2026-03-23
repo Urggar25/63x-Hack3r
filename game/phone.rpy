@@ -753,14 +753,20 @@ screen phone_ui():
                         spacing 18
                         xalign 0.5
                         yalign 0.5
-                        add "phone/home.png":
+
+                        fixed:
                             xalign 0.5
-                            fit "contain"
-                            xmaximum 300
-                            ymaximum 220
+                            xsize 300
+                            ysize 220
+
+                            add "phone/home.png":
+                                xalign 0.5
+                                yalign 0.5
+
                         text "Choisis une app pour afficher son contenu.":
                             style "phone_channel_preview_style"
                             xalign 0.5
+
                         text "Les messages s'affichent uniquement après clic sur Messages.":
                             style "phone_channel_preview_style"
                             xalign 0.5
