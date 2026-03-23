@@ -1,22 +1,9 @@
 init python:
     GHOSTNET_MODULES = ["Discussion", "Galerie", "Réseau"]
 
-    GHOSTNET_PROFILE_OPTIONS = [
-        {"label": "Portrait Bleu", "bg": "#d8e9f8", "fg": "#1f4d72"},
-        {"label": "Portrait Cyan", "bg": "#d9f3f6", "fg": "#1f5f67"},
-        {"label": "Portrait Ardoise", "bg": "#e5e8ef", "fg": "#3f4f6b"},
-    ]
+    GHOSTNET_PROFILE_FALLBACK = {"id": "fallback", "label": "Aucune photo", "bg": "#d9d9d9", "fg": "#666666", "image": None}
 
-    GHOSTNET_GALLERY_LIBRARY = {
-        "romie": [
-            {"id": "josef_01", "label": "Selfie terminal", "bg": "#9dc0df", "fg": "#214667"},
-            {"id": "josef_02", "label": "Photo badge", "bg": "#c9ddf1", "fg": "#2b587b"},
-        ],
-        "bryonn": [
-            {"id": "cassandra_01", "label": "Sourire néon", "bg": "#e6c7f4", "fg": "#6f3a8a"},
-            {"id": "cassandra_02", "label": "Profil marché", "bg": "#f2d8ff", "fg": "#7b4a95"},
-        ],
-    }
+    GHOSTNET_GALLERY_LIBRARY = {"romie": [], "bryonn": []}
 
     def ghostnet_get_dialogues(victim_id):
         return ghostnet_victims[victim_id]["dialogues"]
@@ -74,21 +61,61 @@ init python:
         victim = ghostnet_victims[victim_id]
         return victim["visible_count"] < len(victim["dialogues"])
 
+    def ghostnet_gallery_for_character(character_id):
+        if character_id not in ghostnet_runtime_gallery:
+            ghostnet_runtime_gallery[character_id] = list(GHOSTNET_GALLERY_LIBRARY.get(character_id, []))
+        return ghostnet_runtime_gallery[character_id]
+
     def ghostnet_profile_photo(character_id):
-        gallery = GHOSTNET_GALLERY_LIBRARY.get(character_id, [])
+        gallery = ghostnet_gallery_for_character(character_id)
         if not gallery:
-            return {"label": "Aucune photo", "bg": "#d9d9d9", "fg": "#666666"}
+            return dict(GHOSTNET_PROFILE_FALLBACK)
 
         idx = ghostnet_profile_photo_choices.get(character_id, 0)
         idx = idx % len(gallery)
         return gallery[idx]
 
     def ghostnet_use_gallery_photo(character_id, photo_id):
-        gallery = GHOSTNET_GALLERY_LIBRARY.get(character_id, [])
+        gallery = ghostnet_gallery_for_character(character_id)
         for idx, photo in enumerate(gallery):
             if photo["id"] == photo_id:
                 ghostnet_profile_photo_choices[character_id] = idx
                 return
+
+    def ghostnet_collect_photo_from_dialogue(dialogue_chunk):
+        media_image = ghostnet_dialogue_media_image(dialogue_chunk)
+        speaker_id = dialogue_chunk.get("speaker_id")
+
+        if not media_image or speaker_id not in GHOSTNET_CHARACTER_DIRECTORY or speaker_id == "system":
+            return
+
+        gallery = ghostnet_gallery_for_character(speaker_id)
+        photo_id = "dlg_%s_%s_%s" % (
+            speaker_id,
+            dialogue_chunk.get("date", "").replace(" ", "_"),
+            str(abs(hash(dialogue_chunk.get("text", ""))))[:8],
+        )
+
+        if any(photo["id"] == photo_id for photo in gallery):
+            return
+
+        gallery.append(
+            {
+                "id": photo_id,
+                "label": "Photo %s" % dialogue_chunk.get("date", "sans date"),
+                "bg": "#dcebf7",
+                "fg": "#2b587b",
+                "image": media_image,
+            }
+        )
+
+    def ghostnet_collect_visible_dialogue_photos(character_id, victim_id):
+        for chunk in ghostnet_visible_dialogues(victim_id):
+            ghostnet_collect_photo_from_dialogue(chunk)
+
+        gallery = ghostnet_gallery_for_character(character_id)
+        if gallery:
+            ghostnet_profile_photo_choices[character_id] = ghostnet_profile_photo_choices.get(character_id, 0) % len(gallery)
 
     def ghostnet_dialogue_media_image(dialogue_chunk):
         speaker_id = dialogue_chunk.get("speaker_id")
@@ -111,6 +138,7 @@ default ghostnet_profile_photo_choices = {
     "romie": 0,
     "bryonn": 0,
 }
+default ghostnet_runtime_gallery = {}
 default ghostnet_victims = ghostnet_build_victims()
 
 screen ghostnet_avatar_preview(character_id):
@@ -132,7 +160,10 @@ screen ghostnet_avatar_preview(character_id):
                 ysize 60
                 xalign 0.5
                 yalign 0.5
-                text display_name[0] xalign 0.5 yalign 0.5 color "#ffffff" size 30
+                if profile_photo.get("image"):
+                    add profile_photo["image"] fit "contain" xsize 60 ysize 60
+                else:
+                    text display_name[0] xalign 0.5 yalign 0.5 color "#ffffff" size 30
 
             vbox:
                 spacing 6
@@ -147,6 +178,9 @@ screen ghostnet_v2_ui():
 
     if visible_ids and ghostnet_selected_victim not in visible_ids:
         $ ghostnet_selected_victim = visible_ids[0]
+
+    if ghostnet_selected_victim in ghostnet_victims:
+        $ _ghostnet_sync = ghostnet_collect_visible_dialogue_photos(ghostnet_selected_device, ghostnet_selected_victim)
 
     $ victim = ghostnet_victims[ghostnet_selected_victim] if visible_ids else None
     $ visible_dialogues = ghostnet_visible_dialogues(ghostnet_selected_victim) if victim else []
@@ -232,17 +266,19 @@ screen ghostnet_v2_ui():
                             use ghostnet_avatar_preview(participant)
 
                 elif ghostnet_active_module == "Galerie":
-                    $ gallery = GHOSTNET_GALLERY_LIBRARY.get(ghostnet_selected_device, [])
+                    $ gallery = ghostnet_gallery_for_character(ghostnet_selected_device)
                     $ owner_name = GHOSTNET_CHARACTER_DIRECTORY[ghostnet_selected_device]["speaker"]
                     text "Galerie" color "#153247" size 38
                     text "Photos collectées pour [owner_name]." color "#507086" size 17
-                    text "Choisissez une photo pour l'appliquer en photo de profil des discussions." color "#507086" size 16
+                    text "Chaque photo envoyée en discussion est ajoutée automatiquement ici." color "#507086" size 16
+                    text "Cliquez sur une photo pour l'appliquer en photo de profil des discussions." color "#507086" size 16
 
                     if not gallery:
                         text "Aucune photo collectée." color "#32536a" size 20
                     else:
                         for photo in gallery:
-                            frame:
+                            button:
+                                action Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"])
                                 background photo["bg"]
                                 xfill True
                                 xpadding 10
@@ -251,18 +287,19 @@ screen ghostnet_v2_ui():
                                     spacing 10
                                     frame:
                                         background photo["fg"]
-                                        xsize 52
-                                        ysize 52
-                                        text owner_name[0] color "#ffffff" size 24 xalign 0.5 yalign 0.5
+                                        xsize 120
+                                        ysize 80
+                                        if photo.get("image"):
+                                            add photo["image"] fit "contain" xsize 120 ysize 80
+                                        else:
+                                            text owner_name[0] color "#ffffff" size 24 xalign 0.5 yalign 0.5
                                     vbox:
                                         spacing 4
                                         text "[photo['label']]" color "#1d3f57" size 19
                                         if ghostnet_profile_photo(ghostnet_selected_device)["id"] == photo["id"]:
                                             text "Photo de profil active" color "#2c5b77" size 14
                                         else:
-                                            textbutton "Utiliser pour le profil":
-                                                action Function(ghostnet_use_gallery_photo, ghostnet_selected_device, photo["id"])
-                                                text_size 14
+                                            text "Cliquer pour appliquer cette photo" color "#2c5b77" size 14
 
                 else:
                     text "Réseau" color "#153247" size 38
@@ -326,7 +363,10 @@ screen ghostnet_v2_ui():
                                                 background photo["fg"]
                                                 xsize 84
                                                 ysize 84
-                                                text chunk["speaker"][0] color "#ffffff" size 36 xalign 0.5 yalign 0.5
+                                                if photo.get("image"):
+                                                    add photo["image"] fit "contain" xsize 84 ysize 84
+                                                else:
+                                                    text chunk["speaker"][0] color "#ffffff" size 36 xalign 0.5 yalign 0.5
                                             frame:
                                                 background ("#ffffff" if chunk["side"] == "left" else "#d2e6f6")
                                                 xmaximum 760
@@ -339,7 +379,11 @@ screen ghostnet_v2_ui():
                                                     text "[chunk['text']]" color "#112c40" size 21
                                                     if media_image:
                                                         null height 4
-                                                        add im.Scale(media_image, 360, 240)
+                                                        frame:
+                                                            background "#ecf4fb"
+                                                            xsize 360
+                                                            ysize 240
+                                                            add media_image fit "contain" xsize 360 ysize 240
                                             if chunk["side"] == "left":
                                                 null width 180
                                 null height 85
@@ -375,6 +419,12 @@ screen ghostnet_v2_ui():
                             spacing 5
                             text "Photo active : [current_profile['label']]" color "#24455f" size 22
                             text "Cette photo est utilisée dans les discussions de ce personnage." color "#3b607b" size 16
+                            if current_profile.get("image"):
+                                frame:
+                                    background "#d7e8f6"
+                                    xsize 320
+                                    ysize 220
+                                    add current_profile["image"] fit "contain" xsize 320 ysize 220
 
                 else:
                     text "État du réseau" color "#1c3a51" size 36
