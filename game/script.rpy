@@ -5,11 +5,10 @@ label start:
     $ terminal_mode = False
 
     s "Bienvenue dans GHOSTNET."
-    s "Des messages bug s'affichent partout à l'écran... parfait."
-    s "Quelqu'un vient de scanner mon faux QR-Code."
-    s "Enfin une cible qui va me faire gagner un peu d'argent."
-    s "Le terminal a été retiré : toute l'opération passe par l'interface Orwellienne."
-    s "Analyse les datachunks, tagge les preuves, développe le graphe de relations et surveille ton Heat."
+    s "Le terminal a été retiré : toute l'opération passe par l'interface de discussions."
+    s "Les dialogues sont désormais séquentiels, longs et déterministes."
+    s "Clique pour faire défiler chaque message dans l'ordre exact de la conversation."
+    s "Tu peux choisir l'image de profil de chaque personnage à gauche."
 
     call screen ghostnet_v2_ui
 
