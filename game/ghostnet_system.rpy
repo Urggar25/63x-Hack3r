@@ -90,6 +90,18 @@ init python:
                 ghostnet_profile_photo_choices[character_id] = idx
                 return
 
+    def ghostnet_dialogue_media_image(dialogue_chunk):
+        speaker_id = dialogue_chunk.get("speaker_id")
+        text = dialogue_chunk.get("text", "").lower()
+
+        if speaker_id != "romie":
+            return None
+
+        if "envoie photo" in text or "envoie la photo" in text or "t'envoie la photo" in text:
+            return "images/character/romie.png"
+
+        return None
+
 
 default ghostnet_active_module = "Discussion"
 default ghostnet_selected_victim = "DISC-13-04"
@@ -321,11 +333,16 @@ screen ghostnet_v2_ui():
                                                 xpadding 12
                                                 ypadding 8
                                                 vbox:
+                                                    $ media_image = ghostnet_dialogue_media_image(chunk)
                                                     spacing 2
                                                     text "[chunk['speaker']]   [chunk['date']]" color "#32536a" size 15
                                                     text "[chunk['text']]" color "#112c40" size 21
+                                                    if media_image:
+                                                        null height 4
+                                                        add im.Scale(media_image, 360, 240)
                                             if chunk["side"] == "left":
                                                 null width 180
+                                null height 85
 
                         frame:
                             background "#d4e4f2"
