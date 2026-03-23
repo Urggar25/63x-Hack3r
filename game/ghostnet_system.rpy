@@ -8,6 +8,7 @@ init python:
     GHOSTNET_GALLERY_LIBRARY = {"romie": [], "bryonn": []}
     GHOSTNET_INLINE_IMAGE_MAP = {
         "romie_pic001.png": "images/character/romie_pic001.png",
+        "bryonn_pic001.png": "images/character/bryonn_pic001.png",
     }
 
     def ghostnet_get_dialogues(victim_id):
@@ -21,7 +22,10 @@ init python:
         return [
             discussion_id
             for discussion_id in ghostnet_all_discussion_ids()
-            if ghostnet_victims[discussion_id]["device_owner"] == character_id
+            if (
+                ghostnet_victims[discussion_id]["device_owner"] == character_id
+                or character_id in ghostnet_victims[discussion_id].get("participants", [])
+            )
         ]
 
     def ghostnet_visible_dialogues(victim_id):
@@ -130,13 +134,29 @@ init python:
         media_image = None
 
         for filename in re.findall(r"\[([^\[\]]+\.png)\]", cleaned_text, flags=re.IGNORECASE):
-            mapped_image = GHOSTNET_INLINE_IMAGE_MAP.get(filename.lower())
+            lower_filename = filename.lower()
+            mapped_image = GHOSTNET_INLINE_IMAGE_MAP.get(lower_filename)
+            if mapped_image is None:
+                for character_id in GHOSTNET_CHARACTER_DIRECTORY:
+                    if character_id == "system":
+                        continue
+
+                    if lower_filename.startswith(character_id + "_"):
+                        candidate = "images/character/%s" % lower_filename
+                        if renpy.loadable(candidate):
+                            mapped_image = candidate
+                            break
+
             if mapped_image and media_image is None:
                 media_image = mapped_image
             cleaned_text = re.sub(r"\[" + re.escape(filename) + r"\]", "", cleaned_text, flags=re.IGNORECASE)
 
         cleaned_text = cleaned_text.strip()
         return cleaned_text, media_image
+
+    def ghostnet_next_dialogue_and_scroll(victim_id):
+        ghostnet_next_dialogue(victim_id)
+        renpy.restart_interaction()
 
     def ghostnet_dialogue_media_image(dialogue_chunk):
         _cleaned_text, media_image = ghostnet_extract_media_and_text(dialogue_chunk.get("text", ""))
@@ -187,6 +207,7 @@ screen ghostnet_avatar_preview(character_id):
 screen ghostnet_v2_ui():
     tag menu
     modal True
+    default dialogue_scroll = ui.adjustment()
 
     $ visible_ids = ghostnet_visible_discussion_ids_for_device(ghostnet_selected_device)
 
@@ -201,7 +222,10 @@ screen ghostnet_v2_ui():
     $ all_loaded = victim and victim["visible_count"] >= len(victim["dialogues"])
 
     if ghostnet_active_module == "Discussion" and victim and not all_loaded:
-        key "dismiss" action Function(ghostnet_next_dialogue, ghostnet_selected_victim)
+        key "dismiss" action [
+            Function(ghostnet_next_dialogue_and_scroll, ghostnet_selected_victim),
+            SetScreenVariable("dialogue_scroll", ui.adjustment(value=1.0, range=1.0)),
+        ]
 
     add Solid("#d5e7f2")
 
@@ -370,7 +394,7 @@ screen ghostnet_v2_ui():
                             scrollbars "vertical"
                             yfill True
                             xfill True
-                            yinitial 1.0
+                            yadjustment dialogue_scroll
 
                             vbox:
                                 spacing 10
