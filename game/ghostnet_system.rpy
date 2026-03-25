@@ -1,7 +1,7 @@
 init python:
     import re
 
-    GHOSTNET_MODULES = ["Discussion", "Galerie", "Réseau"]
+    GHOSTNET_MODULES = ["Discussion", "Galerie", "Réseau", "Internet"]
 
     GHOSTNET_PROFILE_FALLBACK = {"id": "fallback", "label": "Aucune photo", "bg": "#d9d9d9", "fg": "#666666", "image": None}
 
@@ -10,6 +10,43 @@ init python:
         "romie_pic001.png": "images/character/romie_pic001.png",
         "bryonn_pic001.png": "images/character/bryonn_pic001.png",
     }
+    GHOSTNET_INTERNET_PAGES = {}
+
+    def ghostnet_register_internet_page(page_id, title, summary, body_lines):
+        normalized_id = (page_id or "").strip().upper()
+        if not normalized_id:
+            return
+
+        GHOSTNET_INTERNET_PAGES[normalized_id] = {
+            "id": normalized_id,
+            "title": title,
+            "summary": summary,
+            "body_lines": list(body_lines or []),
+        }
+
+    # Ajout de nouvelles données :
+    # ghostnet_register_internet_page("WEB-XXXX", "Titre", "Résumé", ["Ligne 1", "Ligne 2"])
+    ghostnet_register_internet_page(
+        "WEB-0013",
+        "Fiche technique : COMMUTATEUR V4",
+        "Extrait d'un manuel interne sur un commutateur réseau.",
+        [
+            "ID validé. Chargement de l'archive réussi.",
+            "Le COMMUTATEUR V4 redirige automatiquement les paquets vers des relais fantômes.",
+            "Un délai anormal supérieur à 350ms indique souvent un relais compromis.",
+        ],
+    )
+    ghostnet_register_internet_page(
+        "WEB-2104",
+        "Journal local : Zone 21 / Bloc 04",
+        "Compte-rendu d'incidents mineurs signalés sur le réseau de proximité.",
+        [
+            "ID validé. Rapport récupéré.",
+            "03:12 — Coupure partielle des bornes publiques pendant 7 minutes.",
+            "03:41 — Reprise du trafic après redémarrage manuel du nœud principal.",
+            "04:03 — Activité inhabituelle détectée sur une route secondaire.",
+        ],
+    )
 
     def ghostnet_get_dialogues(victim_id):
         return ghostnet_victims[victim_id]["dialogues"]
@@ -162,6 +199,22 @@ init python:
         _cleaned_text, media_image = ghostnet_extract_media_and_text(dialogue_chunk.get("text", ""))
         return media_image
 
+    def ghostnet_search_internet():
+        query = (store.ghostnet_internet_query or "").strip().upper()
+        page = GHOSTNET_INTERNET_PAGES.get(query)
+
+        if page:
+            store.ghostnet_internet_result_id = query
+            store.ghostnet_internet_error = None
+        else:
+            store.ghostnet_internet_result_id = None
+            store.ghostnet_internet_error = "Cette page ne donne aucun résultat."
+
+    def ghostnet_internet_result():
+        if not store.ghostnet_internet_result_id:
+            return None
+        return GHOSTNET_INTERNET_PAGES.get(store.ghostnet_internet_result_id)
+
 
 default ghostnet_active_module = "Discussion"
 default ghostnet_selected_victim = "DISC-13-04"
@@ -173,6 +226,9 @@ default ghostnet_profile_photo_choices = {
 }
 default ghostnet_runtime_gallery = {}
 default ghostnet_lightbox_image = None
+default ghostnet_internet_query = ""
+default ghostnet_internet_result_id = None
+default ghostnet_internet_error = None
 default ghostnet_victims = ghostnet_build_victims()
 
 screen ghostnet_avatar_preview(character_id):
@@ -353,28 +409,62 @@ screen ghostnet_v2_ui():
                                                 ypadding 4
 
                 else:
-                    text "Réseau" color "#153247" size 38
-                    text "Choisissez l'appareil à inspecter." color "#507086" size 17
+                    if ghostnet_active_module == "Réseau":
+                        text "Réseau" color "#153247" size 38
+                        text "Choisissez l'appareil à inspecter." color "#507086" size 17
 
-                    for character_id, character_data in GHOSTNET_CHARACTER_DIRECTORY.items():
-                        if character_id == "system":
-                            continue
+                        for character_id, character_data in GHOSTNET_CHARACTER_DIRECTORY.items():
+                            if character_id == "system":
+                                continue
 
-                        $ available = len(ghostnet_visible_discussion_ids_for_device(character_id))
-                        button:
-                            action Function(ghostnet_set_device, character_id)
-                            background ("#c7dff1" if ghostnet_selected_device == character_id else "#dcebf7")
+                            $ available = len(ghostnet_visible_discussion_ids_for_device(character_id))
+                            button:
+                                action Function(ghostnet_set_device, character_id)
+                                background ("#c7dff1" if ghostnet_selected_device == character_id else "#dcebf7")
+                                xfill True
+                                xpadding 10
+                                ypadding 10
+                                vbox:
+                                    spacing 3
+                                    text "[character_data['speaker']]" color "#1d3f57" size 21
+                                    text "Appareil : [character_data['device_name']]" color "#355d78" size 15
+                                    text "Discussions accessibles : [available]" color "#476f8c" size 14
+                                    $ tags_for_character = sorted({ghostnet_victims[d]["unlock_tag"] for d in ghostnet_visible_discussion_ids_for_device(character_id) if ghostnet_victims[d].get("unlock_tag") and ghostnet_victims[d]["unlock_tag"] in ghostnet_unlocked_tags})
+                                    if tags_for_character:
+                                        text "Tags débloqués : [', '.join(tags_for_character)]" color "#476f8c" size 14
+                    else:
+                        text "Internet" color "#153247" size 38
+                        text "Rechercher une page par ID (ex: WEB-0013)." color "#507086" size 17
+
+                        frame:
+                            background "#dcebf7"
                             xfill True
                             xpadding 10
                             ypadding 10
                             vbox:
-                                spacing 3
-                                text "[character_data['speaker']]" color "#1d3f57" size 21
-                                text "Appareil : [character_data['device_name']]" color "#355d78" size 15
-                                text "Discussions accessibles : [available]" color "#476f8c" size 14
-                                $ tags_for_character = sorted({ghostnet_victims[d]["unlock_tag"] for d in ghostnet_visible_discussion_ids_for_device(character_id) if ghostnet_victims[d].get("unlock_tag") and ghostnet_victims[d]["unlock_tag"] in ghostnet_unlocked_tags})
-                                if tags_for_character:
-                                    text "Tags débloqués : [', '.join(tags_for_character)]" color "#476f8c" size 14
+                                spacing 8
+                                input value VariableInputValue("ghostnet_internet_query", length=20) color "#133149" size 22
+                                hbox:
+                                    spacing 10
+                                    textbutton "Rechercher":
+                                        action Function(ghostnet_search_internet)
+                                        background "#2e5a78"
+                                        text_color "#eef7ff"
+                                        text_size 16
+                                        xpadding 12
+                                        ypadding 6
+                                    textbutton "Effacer":
+                                        action [
+                                            SetVariable("ghostnet_internet_query", ""),
+                                            SetVariable("ghostnet_internet_result_id", None),
+                                            SetVariable("ghostnet_internet_error", None),
+                                        ]
+                                        background "#56758b"
+                                        text_color "#eef7ff"
+                                        text_size 16
+                                        xpadding 12
+                                        ypadding 6
+                                text "IDs disponibles pour la démo : [', '.join(sorted(GHOSTNET_INTERNET_PAGES.keys()))]" color "#355d78" size 14
 
         frame:
             background "#f1f7fc"
@@ -483,7 +573,7 @@ screen ghostnet_v2_ui():
                                     ysize 220
                                     add current_profile["image"] fit "contain" xsize 320 ysize 220
 
-                else:
+                elif ghostnet_active_module == "Réseau":
                     text "État du réseau" color "#1c3a51" size 36
                     text "Tags débloqués" color "#4f7894" size 20
                     if ghostnet_unlocked_tags:
@@ -491,6 +581,44 @@ screen ghostnet_v2_ui():
                             text "• [tag]" color "#2d5168" size 18
                     else:
                         text "Aucun tag débloqué." color "#2d5168" size 18
+                else:
+                    $ internet_page = ghostnet_internet_result()
+                    text "Navigateur GHOSTNET" color "#1c3a51" size 36
+                    if ghostnet_internet_error:
+                        frame:
+                            background "#f6dede"
+                            xfill True
+                            xpadding 12
+                            ypadding 10
+                            text "[ghostnet_internet_error]" color "#7c2020" size 21
+                    elif internet_page:
+                        frame:
+                            background "#d7e8f6"
+                            xfill True
+                            xpadding 12
+                            ypadding 10
+                            vbox:
+                                spacing 6
+                                text "Résultat : [internet_page['id']]" color "#21455f" size 18
+                                text "[internet_page['title']]" color "#16374d" size 28
+                                text "[internet_page['summary']]" color "#315976" size 18
+                        viewport:
+                            draggable True
+                            mousewheel True
+                            scrollbars "vertical"
+                            yfill True
+                            xfill True
+                            frame:
+                                background "#ffffff"
+                                xfill True
+                                xpadding 12
+                                ypadding 12
+                                vbox:
+                                    spacing 10
+                                    for line in internet_page["body_lines"]:
+                                        text "[line]" color "#112c40" size 20
+                    else:
+                        text "Aucune page chargée. Saisissez un ID puis cliquez sur Rechercher." color "#32536a" size 19
 
     if ghostnet_lightbox_image:
         frame:
