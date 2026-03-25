@@ -82,7 +82,7 @@ init -1 python:
             dialogue("bryonn", "Garde le top. Et la jupe. Tout"),
             dialogue("bryonn", "Je t’aime sale gosse"),
             dialogue("romie", "Moi aussi sale livreur"),
-dialogue("romie", "Dépêche ❤️"),
+            dialogue("romie", "Dépêche ❤️"),
             dialogue("system", "Session close."),
         ],
     )
