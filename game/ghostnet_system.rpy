@@ -443,7 +443,7 @@ screen ghostnet_v2_ui():
                             ypadding 10
                             vbox:
                                 spacing 8
-                                input value VariableInputValue("ghostnet_internet_query", length=20) color "#133149" size 22
+                                input value VariableInputValue("ghostnet_internet_query") color "#133149" size 22
                                 hbox:
                                     spacing 10
                                     textbutton "Rechercher":
